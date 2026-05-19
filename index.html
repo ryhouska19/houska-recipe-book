@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Houska Recipe Box</title>
+<title>Houska Family Recipe Book</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -96,12 +96,11 @@
 <body>
 <header>
   <div class="header-eyebrow">Est. Family Kitchen</div>
-  <h1>The Houska <em>Recipe Box</em></h1>
-  <div class="header-sub">Tried, tested, and rated by the family</div>
+  <h1>Houska Family <em>Recipe Book</em></h1>
+  <div class="header-sub">The best of family recipes...and the internet.</div>
   <div class="header-stats">
     <div class="stat"><div class="stat-num" id="total-count">—</div><div class="stat-label">Recipes</div></div>
-    <div class="stat"><div class="stat-num" id="five-star-count">—</div><div class="stat-label">Five Star</div></div>
-    <div class="stat"><div class="stat-num" id="gf-count">—</div><div class="stat-label">GF Friendly</div></div>
+    <div class="stat"><div class="stat-num" id="gf-count">—</div><div class="stat-label">GF-Optional</div></div>
   </div>
 </header>
 <div class="controls">
@@ -205,9 +204,9 @@ function normalizeRow(row) {
     chef: get(row,'chef','Chef','Author','author','By') || 'Houska',
     rating: parseFloat(get(row,'rating','Rating','Stars','stars')) || null,
     category: get(row,'category','Category','Type','type','Course') || 'Main',
-    prep: parseInt(get(row,'prep','Prep','prep_time','Prep Time','Prep (min)')) || 0,
-    cook: parseInt(get(row,'cook','Cook','cook_time','Cook Time','Cook (min)')) || 0,
-    total: parseInt(get(row,'total','Total','total_time','Total Time','Total (min)')) || 0,
+    prep: parseInt(get(row,'prep','Prep','prep_time','Prep Time','Prep (min)','Prep (mins)')) || 0,
+    cook: parseInt(get(row,'cook','Cook','cook_time','Cook Time','Cook (min)','Cook (mins)')) || 0,
+    total: parseInt(get(row,'total','Total','total_time','Total Time','Total (min)','Total (mins)')) || 0,
     gf: toBool(get(row,'gf','GF','gluten_free','Gluten Free','Gluten-Free')),
     df: toBool(get(row,'df','DF','dairy_free','Dairy Free','Dairy-Free')),
     veg: toBool(get(row,'veg','Veg','vegetarian','Vegetarian')),
@@ -227,7 +226,6 @@ function formatTime(m) {
 
 function updateStats() {
   document.getElementById('total-count').textContent = RECIPES.length;
-  document.getElementById('five-star-count').textContent = RECIPES.filter(r => r.rating === 5).length;
   document.getElementById('gf-count').textContent = RECIPES.filter(r => r.gf).length;
 }
 
