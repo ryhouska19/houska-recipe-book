@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Houska Recipe Box</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6f0; --parchment: #f2ead8; --ink: #1c1410; --ink-light: #4a3728;
+    --rust: #b84c2b; --rust-light: #e8654a; --gold: #c4973a; --gold-light: #e8c06a;
+    --sage: #5c7a5c; --card-bg: #fff9f2; --border: #ddd3be;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--cream); color: var(--ink); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+  header { background: var(--ink); color: var(--cream); padding: 2.5rem 2rem 2rem; text-align: center; position: relative; overflow: hidden; }
+  header::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(196,151,58,0.04) 40px, rgba(196,151,58,0.04) 41px); }
+  .header-eyebrow { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 400; line-height: 1.1; color: var(--cream); margin-bottom: 0.5rem; }
+  header h1 em { color: var(--gold-light); font-style: italic; }
+  .header-sub { font-size: 0.85rem; color: rgba(250,246,240,0.5); margin-top: 0.75rem; }
+  .header-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(196,151,58,0.2); }
+  .stat { text-align: center; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold-light); line-height: 1; }
+  .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(250,246,240,0.45); margin-top: 0.2rem; }
+  .controls { background: var(--parchment); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; position: sticky; top: 0; z-index: 100; }
+  .search-wrap { flex: 1; min-width: 180px; position: relative; }
+  .search-wrap input { width: 100%; padding: 0.55rem 0.75rem 0.55rem 2.2rem; border: 1.5px solid var(--border); border-radius: 6px; background: var(--card-bg); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--ink); outline: none; transition: border-color 0.2s; }
+  .search-wrap input:focus { border-color: var(--rust); }
+  .search-icon { position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--ink-light); opacity: 0.4; font-size: 0.85rem; }
+  .filter-group { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .filter-btn { padding: 0.4rem 0.9rem; border: 1.5px solid var(--border); border-radius: 20px; background: var(--card-bg); font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 500; color: var(--ink-light); cursor: pointer; transition: all 0.18s; }
+  .filter-btn:hover { border-color: var(--rust); color: var(--rust); }
+  .filter-btn.active { background: var(--rust); border-color: var(--rust); color: white; }
+  .diet-toggle { display: flex; gap: 0.3rem; padding: 0.25rem; background: var(--border); border-radius: 20px; }
+  .diet-btn { padding: 0.3rem 0.75rem; border: none; border-radius: 16px; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 500; color: var(--ink-light); cursor: pointer; transition: all 0.18s; }
+  .diet-btn.active { background: var(--sage); color: white; }
+  .refresh-btn { padding: 0.4rem 0.75rem; border: 1.5px solid var(--border); border-radius: 20px; background: var(--card-bg); font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 500; color: var(--ink-light); cursor: pointer; transition: all 0.18s; }
+  .refresh-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .main { padding: 1.5rem; max-width: 1400px; margin: 0 auto; }
+  .results-count { font-size: 0.75rem; color: var(--ink-light); opacity: 0.6; margin-bottom: 1rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+  .card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 1.25rem; cursor: pointer; transition: all 0.22s; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--border); transition: background 0.2s; }
+  .card:hover { border-color: var(--rust); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(184,76,43,0.1); }
+  .card:hover::before { background: var(--rust); }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+  .card-category { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 500; padding: 0.2rem 0.55rem; border-radius: 3px; }
+  .cat-Main { background: rgba(184,76,43,0.1); color: var(--rust); }
+  .cat-Side { background: rgba(92,122,92,0.1); color: var(--sage); }
+  .cat-Dessert { background: rgba(196,151,58,0.12); color: var(--gold); }
+  .card-rating { font-size: 0.75rem; color: var(--gold); font-weight: 500; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 400; line-height: 1.3; color: var(--ink); margin-bottom: 0.5rem; }
+  .card-chef { font-size: 0.72rem; color: var(--ink-light); opacity: 0.6; margin-bottom: 0.75rem; font-style: italic; }
+  .card-meta { display: flex; gap: 1rem; font-size: 0.72rem; color: var(--ink-light); opacity: 0.7; margin-bottom: 0.75rem; }
+  .card-badges { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+  .badge { font-size: 0.6rem; font-weight: 500; padding: 0.15rem 0.45rem; border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .badge-gf { background: rgba(92,122,92,0.12); color: var(--sage); }
+  .badge-df { background: rgba(196,151,58,0.12); color: var(--gold); }
+  .badge-veg { background: rgba(92,122,92,0.18); color: var(--sage); }
+  .card-note { font-size: 0.72rem; color: var(--ink-light); opacity: 0.65; font-style: italic; margin-top: 0.6rem; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 0.6rem; }
+  .has-recipe { position: absolute; bottom: 0.8rem; right: 0.9rem; font-size: 0.6rem; color: var(--rust); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(28,20,16,0.65); backdrop-filter: blur(4px); z-index: 999; padding: 1.5rem; overflow-y: auto; }
+  .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+  .modal { background: var(--cream); border-radius: 12px; max-width: 720px; width: 100%; margin: auto; overflow: hidden; box-shadow: 0 32px 80px rgba(0,0,0,0.3); animation: slideUp 0.28s ease; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .modal-header { background: var(--ink); color: var(--cream); padding: 1.75rem 2rem 1.5rem; position: relative; }
+  .modal-category { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 0.5rem; }
+  .modal-header h2 { font-family: 'Playfair Display', serif; font-size: 1.65rem; font-weight: 400; line-height: 1.2; }
+  .modal-header-meta { display: flex; gap: 1.5rem; font-size: 0.75rem; color: rgba(250,246,240,0.55); margin-top: 0.75rem; flex-wrap: wrap; }
+  .modal-close { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.1); border: none; color: var(--cream); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: rgba(255,255,255,0.2); }
+  .modal-badges { display: flex; gap: 0.4rem; margin-top: 0.75rem; flex-wrap: wrap; }
+  .modal-badge { font-size: 0.65rem; font-weight: 500; padding: 0.2rem 0.6rem; border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .modal-body { padding: 1.75rem 2rem; }
+  .modal-note { background: var(--parchment); border-left: 3px solid var(--gold); padding: 0.85rem 1rem; border-radius: 0 6px 6px 0; font-size: 0.82rem; font-style: italic; color: var(--ink-light); line-height: 1.6; margin-bottom: 1.5rem; }
+  .modal-section-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 400; color: var(--ink); margin-bottom: 0.85rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; }
+  .modal-section-title::before { content: ''; display: inline-block; width: 3px; height: 1em; background: var(--rust); border-radius: 2px; }
+  .ingredients-grid { display: grid; gap: 0.35rem; margin-bottom: 1.75rem; }
+  .ingredient-group-title { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--rust); font-weight: 500; margin-top: 0.75rem; margin-bottom: 0.35rem; }
+  .ingredient-row { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.83rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(221,211,190,0.5); line-height: 1.4; }
+  .ingredient-amount { font-weight: 500; color: var(--rust); min-width: 60px; font-size: 0.8rem; }
+  .ingredient-name { color: var(--ink); flex: 1; }
+  .steps-list { display: grid; gap: 1rem; margin-bottom: 1.75rem; }
+  .step { display: flex; gap: 1rem; align-items: flex-start; font-size: 0.85rem; line-height: 1.65; }
+  .step-num { background: var(--ink); color: var(--cream); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 500; flex-shrink: 0; margin-top: 0.1rem; }
+  .step-content { flex: 1; color: var(--ink-light); }
+  .step-title { font-weight: 500; color: var(--ink); font-size: 0.8rem; margin-bottom: 0.2rem; }
+  .step-time { font-size: 0.7rem; color: var(--rust); opacity: 0.7; margin-top: 0.2rem; font-style: italic; }
+  .no-recipe { background: var(--parchment); border-radius: 8px; padding: 1.5rem; text-align: center; color: var(--ink-light); font-size: 0.85rem; opacity: 0.7; font-style: italic; }
+  .empty-state { grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: var(--ink-light); }
+  .empty-state p:first-child { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 0.5rem; }
+  @media (max-width: 600px) { .controls { gap: 0.5rem; } .header-stats { gap: 1rem; } .modal-body { padding: 1.25rem; } .modal-header { padding: 1.25rem; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-eyebrow">Est. Family Kitchen</div>
+  <h1>The Houska <em>Recipe Box</em></h1>
+  <div class="header-sub">Tried, tested, and rated by the family</div>
+  <div class="header-stats">
+    <div class="stat"><div class="stat-num" id="total-count">—</div><div class="stat-label">Recipes</div></div>
+    <div class="stat"><div class="stat-num" id="five-star-count">—</div><div class="stat-label">Five Star</div></div>
+    <div class="stat"><div class="stat-num" id="gf-count">—</div><div class="stat-label">GF Friendly</div></div>
+  </div>
+</header>
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="search" placeholder="Search recipes, ingredients, notes…" oninput="filterRecipes()">
+  </div>
+  <div class="filter-group" id="cat-filters">
+    <button class="filter-btn active" onclick="setCat('all',this)">All</button>
+    <button class="filter-btn" onclick="setCat('Main',this)">Mains</button>
+    <button class="filter-btn" onclick="setCat('Side',this)">Sides</button>
+    <button class="filter-btn" onclick="setCat('Dessert',this)">Desserts</button>
+  </div>
+  <div class="diet-toggle">
+    <button class="diet-btn" id="btn-gf" onclick="toggleDiet('gf')">GF</button>
+    <button class="diet-btn" id="btn-df" onclick="toggleDiet('df')">DF</button>
+    <button class="diet-btn" id="btn-veg" onclick="toggleDiet('veg')">Veg</button>
+  </div>
+  <button class="refresh-btn" onclick="loadFromSheet()">↻ Refresh</button>
+</div>
+<div class="main">
+  <div class="results-count" id="results-count"></div>
+  <div class="grid" id="grid"></div>
+</div>
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      <div class="modal-category" id="m-cat"></div>
+      <h2 id="m-name"></h2>
+      <div class="modal-badges" id="m-badges"></div>
+      <div class="modal-header-meta" id="m-meta"></div>
+    </div>
+    <div class="modal-body" id="m-body"></div>
+  </div>
+</div>
+
+<script>
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8h2NVT0qZHt7jxJJpL8p1mcAzJrQyDGSY6H6hh4ja3OLp23t8tTV38RYDkNkvxD00Z9cKaJVIzSRA/pub?output=csv';
+
+// Full hand-written recipes — matched to sheet rows by recipe name
+const WRITTEN = {
+  "grandma's meat sauce": { id:"meat-sauce", ingredients:[{group:"Meats",items:[{amount:"4 lbs",name:"Ground Sirloin (or Ground Chicken)"},{amount:"1.5 lbs",name:"Mild/Spicy Sausage"}]},{group:"Produce",items:[{amount:"6 cloves",name:"Garlic, chopped"},{amount:"1 medium",name:"Yellow onion, diced"}]},{group:"Canned / Jarred",items:[{amount:"2 × 28oz",name:"Crushed Tomatoes"},{amount:"3 × 28oz",name:"Tomato Puree"},{amount:"1 × 12oz",name:"Tomato Paste"}]},{group:"Spices",items:[{amount:"2 Tbsp",name:"Dried Basil"},{amount:"1 Tbsp",name:"Dried Oregano"},{amount:"1 tsp",name:"Red Pepper Flakes"},{amount:"to taste",name:"Salt & Pepper"}]},{group:"Other",items:[{amount:"2 oz",name:"Semi-Sweet or Dark Chocolate"},{amount:"few dashes",name:"Tabasco"}]}],steps:[{num:1,title:"Brown the meats",text:"Brown sirloin and sausage in EVOO in a large stock pot. Drain grease."},{num:2,title:"Sauté aromatics",text:"Sauté onions until softened. Add garlic and cook 1 minute more."},{num:3,title:"Combine",text:"Add onion and garlic to the meat pot."},{num:4,title:"Build the sauce",text:"Add crushed tomatoes, tomato puree, tomato paste, all spices, tabasco, and chocolate."},{num:5,title:"Simmer",text:"Bring to a boil, then reduce to a low simmer. Cook at least 2 hours.",time:"2 hours"},{num:6,title:"Adjust & serve",text:"Taste and adjust seasonings. Serve over pasta or GF noodles."}] },
+  "nyt short ribs": { id:"short-ribs", ingredients:[{group:"Meat",items:[{amount:"5 lbs",name:"Bone-in short ribs, at least 1½ inches thick"}]},{group:"Produce",items:[{amount:"2 heads",name:"Garlic, halved crosswise"},{amount:"1 medium",name:"Onion, chopped"},{amount:"4 ribs",name:"Celery, chopped"},{amount:"2 medium",name:"Carrots, chopped"},{amount:"1 cup",name:"Fresh parsley, coarsely chopped"},{amount:"½ cup",name:"Chives, finely chopped"},{amount:"1 Tbsp",name:"Lemon zest"},{amount:"4 sprigs",name:"Fresh thyme"}]},{group:"Pantry",items:[{amount:"3 Tbsp",name:"Tomato paste"},{amount:"2 cups",name:"Beef stock or bone broth"},{amount:"glug",name:"Red wine"},{amount:"to taste",name:"Kosher salt & pepper"}]}],steps:[{num:1,title:"Sear the ribs",text:"Heat oven to 275°F. Sear ribs in batches 6–8 min per batch until deeply browned.",time:"20–30 min"},{num:2,title:"Build the base",text:"Sauté garlic, onion, celery, carrots. Add tomato paste and caramelize.",time:"15 min"},{num:3,title:"Deglaze & add liquid",text:"Add red wine, scraping up browned bits. Add beef stock and thyme. Nestle ribs back in bone-side up."},{num:4,title:"Braise",text:"Cover and transfer to oven. Cook 3½ to 4 hours.",time:"3½–4 hours"},{num:5,title:"Rest & finish",text:"Remove ribs. Strain sauce and skim fat. Scatter parsley, chives, and lemon zest over ribs."}] },
+  "turmeric ginger lemon chicken stew": { id:"chicken-stew", ingredients:[{group:"Stew",items:[{amount:"4 lbs",name:"Boneless skinless chicken thighs"},{amount:"2 Tbsp",name:"Garlic-infused olive oil"},{amount:"2 Tbsp",name:"Fresh grated ginger"},{amount:"2 tsp",name:"Turmeric"},{amount:"1.5 tsp",name:"Sea salt"},{amount:"1.5 cups",name:"Jasmine or basmati rice"},{amount:"6 cups",name:"Chicken bone broth"},{amount:"3 whole",name:"Carrots, sliced"},{amount:"2",name:"Bay leaves"},{amount:"1 tsp",name:"Dijon mustard"},{amount:"2 Tbsp",name:"Fresh lemon juice"},{amount:"1 Tbsp",name:"Ghee"}]}],steps:[{num:1,title:"Sear chicken",text:"Sear thighs 3–4 min per side in a Dutch oven. Remove and set aside.",time:"8 min"},{num:2,title:"Bloom spices",text:"Add ginger and turmeric. Stir until fragrant.",time:"1–2 min"},{num:3,title:"Build base",text:"Add rice, carrots, bay leaves, and Dijon. Stir to coat."},{num:4,title:"Simmer",text:"Add broth. Return chicken. Cover and simmer on low until rice is tender.",time:"25–30 min"},{num:5,title:"Shred & finish",text:"Remove bay leaves. Shred chicken. Stir in lemon juice and ghee. Adjust seasoning."}] },
+  "reverse-seared ribeye": { id:"ribeye", ingredients:[{group:"Steak",items:[{amount:"1 steak",name:"Ribeye, 1.5–2 inch thick"},{amount:"liberal",name:"Kosher salt (dry brine)"},{amount:"to taste",name:"Fresh cracked pepper"}]},{group:"For the Sear",items:[{amount:"1–2 tsp",name:"Avocado oil"},{amount:"1 Tbsp",name:"Ghee (optional)"},{amount:"1–2 sprigs",name:"Rosemary or thyme (optional)"},{amount:"1 clove",name:"Garlic, smashed (optional)"}]}],steps:[{num:1,title:"Dry brine",text:"Salt steak heavily on all sides. Place uncovered on a rack in the fridge.",time:"8–24 hours ahead"},{num:2,title:"Low & slow",text:"Preheat oven to 200°F. Bake on a rack until internal temp reaches 110–115°F.",time:"45–75 min"},{num:3,title:"Rest",text:"Remove from oven and rest before searing.",time:"10 min"},{num:4,title:"Sear",text:"Superheat cast iron with avocado oil. Sear 60–90 seconds per side. Add ghee, herbs, garlic. Render fat cap 20–30 seconds.",time:"3–4 min"},{num:5,title:"Pull & rest",text:"Remove at 125–128°F for medium-rare. Rest before slicing.",time:"5–8 min"}] },
+  "mike's hot honey garlic roasted chicken thighs": { id:"hot-honey-chicken", ingredients:[{group:"Chicken",items:[{amount:"4 lbs",name:"Bone-in skin-on chicken thighs"},{amount:"1 tsp each",name:"Smoked paprika, garlic powder, onion powder"},{amount:"to taste",name:"Kosher salt & black pepper"}]},{group:"Glaze",items:[{amount:"3 Tbsp",name:"Mike's Hot Honey"},{amount:"4 cloves",name:"Garlic, minced"},{amount:"2 Tbsp",name:"Soy sauce (or tamari for GF)"},{amount:"1 Tbsp",name:"Unsalted butter"},{amount:"1 tsp",name:"Rice vinegar or apple cider vinegar"}]}],steps:[{num:1,title:"Dry brine",text:"Season thighs on all sides. Rest uncovered on a rack in fridge 30 min or overnight.",time:"30 min – overnight"},{num:2,title:"Sear",text:"Cast iron over medium. Sear skin-side down 7–8 min until golden. Flip and sear flesh side 2 min.",time:"9–10 min"},{num:3,title:"Roast",text:"Transfer to 425°F oven skin-side up until 190–195°F internal.",time:"20–25 min"},{num:4,title:"Make the glaze",text:"Melt butter. Sauté garlic 1–2 min. Add honey, soy sauce, vinegar. Simmer until slightly thickened.",time:"6–8 min"},{num:5,title:"Glaze & finish",text:"Brush glaze on skin in last 5–7 min. Watch closely — honey burns fast. Rest 5–10 min.",time:"5–10 min"}] },
+  "coconut jasmine rice": { id:"coconut-rice", ingredients:[{group:"",items:[{amount:"1.5 cups",name:"Jasmine rice"},{amount:"1 can (13.5oz)",name:"Full-fat coconut milk"},{amount:"¾ cup",name:"Water or chicken stock"},{amount:"½ tsp",name:"Salt"}]}],steps:[{num:1,title:"Combine",text:"Rinse rice once. Combine with coconut milk, water or stock, and salt in a saucepan."},{num:2,title:"Boil & simmer",text:"Bring to a boil, reduce to the lowest simmer, cover tightly and cook 15 minutes.",time:"15 min"},{num:3,title:"Steam & serve",text:"Remove from heat. Leave covered 10 minutes undisturbed. Fluff and serve.",time:"10 min"}] },
+  "high-protein minestrone": { id:"minestrone", ingredients:[{group:"Protein",items:[{amount:"2 lbs",name:"Italian sausage, removed from casing"},{amount:"1.5 lbs",name:"Boneless skinless chicken breasts"}]},{group:"Base",items:[{amount:"1 large",name:"Yellow onion, diced"},{amount:"3 whole",name:"Carrots, diced"},{amount:"3 ribs",name:"Celery, diced"},{amount:"4 cloves",name:"Garlic, minced"},{amount:"2 Tbsp",name:"Tomato paste"}]},{group:"Liquid & Vegetables",items:[{amount:"10–12 cups",name:"Chicken stock, low sodium"},{amount:"1 × 28oz",name:"Crushed tomatoes"},{amount:"2 medium",name:"Zucchini, diced"},{amount:"1.5 cups",name:"Green beans, chopped"},{amount:"3 cups",name:"Spinach or kale"},{amount:"2 × 15oz",name:"Cannellini beans, drained"},{amount:"1.5 cups",name:"Ditalini pasta (optional)"}]},{group:"Seasoning",items:[{amount:"2 tsp",name:"Dried oregano"},{amount:"1 rind",name:"Parmesan rind (optional)"},{amount:"1–2 Tbsp",name:"Fresh lemon juice"}]}],steps:[{num:1,title:"Brown sausage",text:"Brown sausage in a Dutch oven. Remove and set aside.",time:"8–10 min"},{num:2,title:"Sauté base",text:"Cook onion, carrot, and celery. Add garlic and tomato paste.",time:"7 min"},{num:3,title:"Add liquid",text:"Add stock, tomatoes, oregano, and parmesan rind. Bring to a simmer."},{num:4,title:"Poach & shred chicken",text:"Add chicken breasts. Poach until 165°F. Remove, shred, and return to pot.",time:"15 min"},{num:5,title:"Add beans & veg",text:"Add cannellini beans, zucchini, green beans, and pasta if using.",time:"10–12 min"},{num:6,title:"Finish",text:"Stir in spinach until wilted. Remove parmesan rind. Add lemon juice."}] },
+  "gumbo with chicken & andouille sausage": { id:"gumbo", ingredients:[{group:"Proteins & Stock",items:[{amount:"2 lbs",name:"Boneless/skinless chicken thighs"},{amount:"1 lb",name:"Andouille sausage (GF/DF)"},{amount:"10 cups",name:"Chicken broth, low-sodium"}]},{group:"Vegetables",items:[{amount:"2 cups each",name:"Celery, green bell pepper, yellow onion — diced"},{amount:"1 cup",name:"Tomatoes, diced"},{amount:"6 cloves",name:"Garlic, minced"},{amount:"1 cup",name:"Okra, sliced (optional)"}]},{group:"Seasonings",items:[{amount:"2 Tbsp",name:"Smoked paprika"},{amount:"1 Tbsp each",name:"Cayenne, black pepper, salt, oregano, thyme"},{amount:"2 Tbsp",name:"Worcestershire sauce (GF/DF)"},{amount:"2",name:"Bay leaves"},{amount:"1 tsp",name:"Gumbo filé powder (optional)"}]}],steps:[{num:1,title:"Sear proteins",text:"Sear chicken thighs 3–4 min per side and sausage slices 2 min per side. Remove both."},{num:2,title:"Roux substitute",text:"Add olive oil and flour. Stir continuously until golden brown.",time:"3–5 min"},{num:3,title:"Sauté vegetables",text:"Add all vegetables and cook until softened.",time:"7 min"},{num:4,title:"Build & simmer",text:"Return proteins. Add seasonings, Worcestershire, bay leaves, and broth. Simmer covered.",time:"45 min"},{num:5,title:"Shred & finish",text:"Shred chicken and return to pot. Add filé powder. Serve over rice."}] },
+  "chicken piccata meatballs": { id:"piccata-meatballs", ingredients:[{group:"Meatballs",items:[{amount:"2 lbs",name:"Ground chicken"},{amount:"¾ cup",name:"Breadcrumbs (GF panko works)"},{amount:"2",name:"Eggs"},{amount:"4 cloves",name:"Garlic, minced"},{amount:"4 Tbsp",name:"Parsley, chopped"},{amount:"2 tsp",name:"Lemon zest"},{amount:"1 tsp",name:"Salt"}]},{group:"Piccata Sauce",items:[{amount:"2 cups",name:"Chicken broth"},{amount:"¼ cup",name:"Fresh lemon juice (~4 lemons)"},{amount:"4 Tbsp",name:"Capers"},{amount:"2 tsp",name:"Dijon mustard"},{amount:"4 tsp",name:"Cornstarch or arrowroot"},{amount:"2 handfuls",name:"Spinach (optional)"}]}],steps:[{num:1,title:"Bake meatballs",text:"Preheat oven to 400°F. Mix, form, and bake meatballs until 165°F.",time:"15–18 min"},{num:2,title:"Build sauce",text:"Sauté garlic. Add broth, lemon juice, capers, and Dijon. Simmer 3–5 min.",time:"5–7 min"},{num:3,title:"Thicken",text:"Stir cornstarch slurry into sauce. Add spinach if using."},{num:4,title:"Serve",text:"Toss meatballs in sauce. Serve over pasta, spaghetti squash, or rice."}] },
+  "korean beef bowls (bulgogi-style)": { id:"korean-beef", ingredients:[{group:"Sauce",items:[{amount:"3 Tbsp",name:"Soy sauce"},{amount:"1 Tbsp",name:"Sesame oil"},{amount:"2 Tbsp",name:"Brown sugar"},{amount:"4 cloves",name:"Garlic, minced"},{amount:"1 tsp",name:"Fresh ginger, grated"},{amount:"½ tsp",name:"Red pepper flakes"}]},{group:"Bowl",items:[{amount:"1 lb",name:"Ground beef"},{amount:"2 heads",name:"Bok choy, roughly chopped"},{amount:"3 cups",name:"Cooked white rice"},{amount:"to taste",name:"Green onions & sesame seeds, for topping"}]}],steps:[{num:1,title:"Make sauce",text:"Mix all sauce ingredients together and set aside."},{num:2,title:"Cook beef",text:"Cook ground beef over medium-high. Let sit undisturbed to build crispy bits. Drain excess fat.",time:"7 min"},{num:3,title:"Caramelize & veg",text:"Pour sauce over beef and caramelize 2 min. Add bok choy until wilted.",time:"3 min"},{num:4,title:"Serve",text:"Serve over rice. Top with green onions, sesame seeds, and a fried egg if desired."}] },
+  "asian cucumber salad": { id:"cucumber-salad", ingredients:[{group:"",items:[{amount:"2",name:"Persian or English cucumbers"},{amount:"½ tsp",name:"Kosher salt"},{amount:"1½ Tbsp",name:"Rice vinegar"},{amount:"1 tsp",name:"Sesame oil"},{amount:"½ tsp",name:"Soy sauce or tamari"},{amount:"½ tsp",name:"Sugar or honey"},{amount:"1 clove",name:"Garlic, finely grated"},{amount:"1 tsp",name:"Sesame seeds"},{amount:"2",name:"Green onions, thinly sliced"},{amount:"½ tsp",name:"Red pepper flakes (optional)"}]}],steps:[{num:1,title:"Salt the cucumbers",text:"Slice cucumbers thin. Toss with salt and let sit in a colander 10 minutes.",time:"10 min"},{num:2,title:"Make the dressing",text:"Whisk together rice vinegar, sesame oil, soy sauce, sugar, and garlic."},{num:3,title:"Combine & serve",text:"Pat cucumbers dry. Toss with dressing, green onions, and red pepper flakes. Rest 5 min. Top with sesame seeds.",time:"5 min"}] },
+};
+
+let RECIPES = [];
+let activeCat = 'all';
+let activeDiets = new Set();
+
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const headers = splitLine(lines[0]).map(h => h.trim());
+  return lines.slice(1).map(line => {
+    const vals = splitLine(line);
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (vals[i] || '').trim(); });
+    return obj;
+  }).filter(r => Object.values(r).some(v => v));
+}
+
+function splitLine(line) {
+  const out = []; let cur = '', q = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { q = !q; }
+    else if (line[i] === ',' && !q) { out.push(cur); cur = ''; }
+    else { cur += line[i]; }
+  }
+  out.push(cur);
+  return out;
+}
+
+function get(row, ...keys) {
+  for (const k of keys) if (row[k] !== undefined && row[k] !== '') return row[k];
+  return null;
+}
+
+function toBool(v) {
+  if (!v) return false;
+  const s = v.toString().toUpperCase().trim();
+  return s === 'TRUE' || s === 'YES' || s === '1' || s === 'X';
+}
+
+function normalizeRow(row) {
+  const name = (get(row, 'name','Name','Recipe Name','recipe_name','RECIPE NAME') || '').trim();
+  if (!name) return null;
+  const key = name.toLowerCase().trim();
+  const w = WRITTEN[key] || {};
+  const id = w.id || key.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  return {
+    id, name,
+    chef: get(row,'chef','Chef','Author','author','By') || 'Houska',
+    rating: parseFloat(get(row,'rating','Rating','Stars','stars')) || null,
+    category: get(row,'category','Category','Type','type','Course') || 'Main',
+    prep: parseInt(get(row,'prep','Prep','prep_time','Prep Time','Prep (min)')) || 0,
+    cook: parseInt(get(row,'cook','Cook','cook_time','Cook Time','Cook (min)')) || 0,
+    total: parseInt(get(row,'total','Total','total_time','Total Time','Total (min)')) || 0,
+    gf: toBool(get(row,'gf','GF','gluten_free','Gluten Free','Gluten-Free')),
+    df: toBool(get(row,'df','DF','dairy_free','Dairy Free','Dairy-Free')),
+    veg: toBool(get(row,'veg','Veg','vegetarian','Vegetarian')),
+    notes: get(row,'notes','Notes','note','Note','Comments') || null,
+    sourceUrl: get(row,'sourceUrl','sourceurl','source_url','Source URL','URL','url','Link','link','Source') || null,
+    ingredients: w.ingredients || null,
+    steps: w.steps || null,
+  };
+}
+
+function formatTime(m) {
+  if (!m) return '—';
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m/60), r = m%60;
+  return r ? `${h}h ${r}m` : `${h}h`;
+}
+
+function updateStats() {
+  document.getElementById('total-count').textContent = RECIPES.length;
+  document.getElementById('five-star-count').textContent = RECIPES.filter(r => r.rating === 5).length;
+  document.getElementById('gf-count').textContent = RECIPES.filter(r => r.gf).length;
+}
+
+function setCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('#cat-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterRecipes();
+}
+
+function toggleDiet(diet) {
+  activeDiets.has(diet) ? activeDiets.delete(diet) : activeDiets.add(diet);
+  document.getElementById('btn-gf').classList.toggle('active', activeDiets.has('gf'));
+  document.getElementById('btn-df').classList.toggle('active', activeDiets.has('df'));
+  document.getElementById('btn-veg').classList.toggle('active', activeDiets.has('veg'));
+  filterRecipes();
+}
+
+function filterRecipes() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const filtered = RECIPES.filter(r => {
+    if (activeCat !== 'all' && r.category !== activeCat) return false;
+    if (activeDiets.has('gf') && !r.gf) return false;
+    if (activeDiets.has('df') && !r.df) return false;
+    if (activeDiets.has('veg') && !r.veg) return false;
+    if (q && ![r.name, r.chef, r.category, r.notes||''].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderGrid(filtered);
+}
+
+function renderGrid(recipes) {
+  document.getElementById('results-count').textContent =
+    recipes.length === RECIPES.length ? `${recipes.length} recipes` : `${recipes.length} of ${RECIPES.length} recipes`;
+  if (!recipes.length) {
+    document.getElementById('grid').innerHTML = '<div class="empty-state"><p>No recipes found</p><p>Try adjusting your filters</p></div>';
+    return;
+  }
+  document.getElementById('grid').innerHTML = recipes.map(r => `
+    <div class="card" onclick="openModal('${r.id}')">
+      <div class="card-top">
+        <span class="card-category cat-${r.category}">${r.category}</span>
+        ${r.rating ? `<span class="card-rating">★ ${r.rating}</span>` : ''}
+      </div>
+      <h3>${r.name}</h3>
+      <div class="card-chef">by ${r.chef}</div>
+      <div class="card-meta">
+        <span>⏱ ${formatTime(r.total)}</span>
+        ${r.prep ? `<span>Prep ${formatTime(r.prep)}</span>` : ''}
+      </div>
+      <div class="card-badges">
+        ${r.gf ? '<span class="badge badge-gf">GF</span>' : ''}
+        ${r.df ? '<span class="badge badge-df">DF</span>' : ''}
+        ${r.veg ? '<span class="badge badge-veg">Veg</span>' : ''}
+      </div>
+      ${r.notes ? `<div class="card-note">${r.notes.length > 90 ? r.notes.slice(0,90)+'…' : r.notes}</div>` : ''}
+      ${r.steps ? '<div class="has-recipe">Full recipe ↗</div>' : (r.sourceUrl ? '<div class="has-recipe">View source ↗</div>' : '')}
+    </div>`).join('');
+}
+
+function openModal(id) {
+  const r = RECIPES.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('m-cat').textContent = r.category;
+  document.getElementById('m-name').textContent = r.name;
+  const badges = [];
+  if (r.gf) badges.push('<span class="modal-badge badge-gf">Gluten-Free</span>');
+  if (r.df) badges.push('<span class="modal-badge badge-df">Dairy-Free</span>');
+  if (r.veg) badges.push('<span class="modal-badge badge-veg">Vegetarian</span>');
+  document.getElementById('m-badges').innerHTML = badges.join('');
+  document.getElementById('m-meta').innerHTML = `
+    <span>by ${r.chef}</span>
+    ${r.rating ? `<span>★ ${r.rating} stars</span>` : ''}
+    <span>Prep ${formatTime(r.prep)}</span>
+    <span>Cook ${formatTime(r.cook)}</span>
+    <span>Total ${formatTime(r.total)}</span>`;
+  let body = '';
+  if (r.notes) body += `<div class="modal-note">${r.notes}</div>`;
+  if (r.ingredients) {
+    body += `<div class="modal-section-title">Ingredients</div><div class="ingredients-grid">`;
+    for (const g of r.ingredients) {
+      if (g.group) body += `<div class="ingredient-group-title">${g.group}</div>`;
+      for (const item of g.items) {
+        body += `<div class="ingredient-row"><span class="ingredient-amount">${item.amount}</span><span class="ingredient-name">${item.name}</span></div>`;
+      }
+    }
+    body += '</div>';
+  }
+  if (r.steps) {
+    body += `<div class="modal-section-title">Instructions</div><div class="steps-list">`;
+    for (const s of r.steps) {
+      body += `<div class="step"><div class="step-num">${s.num}</div><div class="step-content"><div class="step-title">${s.title}</div><div>${s.text}</div>${s.time ? `<div class="step-time">⏱ ${s.time}</div>` : ''}</div></div>`;
+    }
+    body += '</div>';
+  }
+  if (!r.ingredients && !r.steps) {
+    body += r.sourceUrl
+      ? `<a href="${r.sourceUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:0.5rem;background:var(--rust);color:white;padding:0.75rem 1.25rem;border-radius:6px;text-decoration:none;font-size:0.85rem;font-weight:500;font-family:'DM Sans',sans-serif;">Open Full Recipe ↗</a>`
+      : `<div class="no-recipe">Source URL not available.</div>`;
+  }
+  document.getElementById('m-body').innerHTML = body;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) { if (e.target === document.getElementById('modal-overlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modal-overlay').classList.remove('open'); document.body.style.overflow = ''; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+async function loadFromSheet() {
+  document.getElementById('grid').innerHTML = `
+    <div class="empty-state" style="opacity:1">
+      <p style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink)">Loading recipes…</p>
+      <p style="margin-top:0.5rem;font-size:0.8rem;opacity:0.5">Fetching from Google Sheets</p>
+    </div>`;
+  try {
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    if (!rows.length) throw new Error('No rows found');
+    RECIPES = rows.map(normalizeRow).filter(Boolean);
+    if (!RECIPES.length) throw new Error('Could not parse recipes — check column headers match expected names');
+    updateStats();
+    filterRecipes();
+  } catch (err) {
+    document.getElementById('grid').innerHTML = `
+      <div class="empty-state" style="opacity:1">
+        <p style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--rust)">Could not load recipes</p>
+        <p style="margin-top:0.5rem;font-size:0.78rem;opacity:0.7">${err.message}</p>
+        <p style="margin-top:0.75rem;font-size:0.75rem;opacity:0.5">File → Share → Publish to web → CSV in Google Sheets</p>
+      </div>`;
+  }
+}
+
+loadFromSheet();
+</script>
+</body>
+</html>
