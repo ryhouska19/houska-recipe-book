@@ -1503,19 +1503,53 @@ const WRITTEN = {
 
   "avocado corn salad": {
     id: "avocado-corn", section: "sides", servings: 4,
-    sourceUrl: "https://natashaskitchen.com/wprm_print/avocado-corn-salad",
-  },
+      },
 
   "beet, apple, carrot salad": {
     id: "beet-salad", section: "sides", servings: 4,
-    sourceUrl: "https://www.stephgaudreau.com/beet-carrot-apple-salad-recipe/",
-    notes: "Add ACV for a vinegar kick. Would be great with fish. 1 large beet, 8 carrots, 1 green apple. Nothing needs to be exact!",
+    ingredients: [
+      { group: "Salad", items: [
+        { amount: "2 medium", name: "Raw beets, peeled" },
+        { amount: "2 large", name: "Carrots, peeled" },
+        { amount: "1 large", name: "Green apple, cored" },
+        { amount: "2 tsp", name: "Lemon zest (from about 2 lemons)" },
+      ]},
+      { group: "Dressing", items: [
+        { amount: "3 Tbsp", name: "Fresh lemon juice" },
+        { amount: "2 Tbsp", name: "Extra virgin olive oil" },
+        { amount: "1 tsp", name: "Honey or maple syrup (optional)" },
+        { amount: "½ tsp", name: "Kosher salt" },
+        { amount: "¼ tsp", name: "Black pepper" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Shred the vegetables", text: "Using a food processor with a shredding blade or a box grater, shred the carrots and apple first, then the beets last — beets stain everything they touch immediately, so shredding them last keeps the other ingredients their natural color. If your beets stain the whole bowl pink anyway, that’s fine — it tastes the same.", tip: "Wear gloves when handling beets. The stain on your hands is real and stubborn." },
+      { num: 2, title: "Make the dressing", text: "Whisk lemon zest, lemon juice, olive oil, honey if using, salt, and pepper together until emulsified. The lemon is essential — it balances the sweetness of the beet and carrot and keeps the apple from oxidizing." },
+      { num: 3, title: "Combine & dress", text: "Add all shredded vegetables to a large bowl. Pour the dressing over and toss with your hands until everything is evenly combined — hands work better than tongs here for distributing the dressing through every layer." },
+      { num: 4, title: "Rest & serve", text: "Let sit at least 10 min before serving — the salt draws out moisture and the flavors come together. Keeps in the refrigerator up to 3 days; the color deepens but the flavor improves.", time: "10 min" },
+    ],
   },
 
   "1-ingredient buckwheat bread": {
     id: "buckwheat-bread", section: "sides", servings: 8,
-    sourceUrl: "https://www.google.com/search?q=1+ingredient+buckwheat+bread",
-    notes: "Nutty and dense. Great for avocado toast. Make 3 loaves, slice with parchment squares between, and freeze. Takes time — there are 3 steps: soak, blend, bake (~70 min). Beautiful crust.",
+    ingredients: [
+      { group: "Bread", items: [
+        { amount: "2¾ cups (500g)", name: "Raw hulled buckwheat groats — must be unroasted (not kasha)" },
+        { amount: "1 cup", name: "Filtered water, for blending" },
+        { amount: "pinch", name: "Kosher salt (optional but recommended)" },
+      ]},
+      { group: "Optional Toppings", items: [
+        { amount: "1–2 Tbsp", name: "Pumpkin seeds, sesame seeds, or sunflower seeds" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Soak overnight", text: "Rinse buckwheat groats in a colander. Transfer to a large glass or ceramic bowl (avoid metal — it can interfere with fermentation). Cover with 3 cups of water. Cover loosely with a clean cloth and soak at room temperature 8–12 hours, or overnight.", tip: "Use raw, hulled buckwheat groats only. Roasted buckwheat (kasha) will not ferment and will not work.", time: "8–12 hours" },
+      { num: 2, title: "Drain but do not rinse", text: "Drain the soaking water in a colander. Do not rinse the groats. The slimy liquid that coats them is the natural starch and bacteria responsible for fermentation — rinsing strips it away and the bread won’t rise." },
+      { num: 3, title: "Blend to batter", text: "Transfer drained groats to a blender with 1 cup of fresh water and a pinch of salt. Blend until completely smooth — the consistency should be like thick pancake batter. If it’s too thick, add water 1 Tbsp at a time.", },
+      { num: 4, title: "Ferment 24 hours", text: "Pour batter into a clean glass bowl. Cover with a cloth and leave at room temperature for 20–24 hours undisturbed. The batter should develop visible bubbles on the surface and a gentle, yeasty-tangy smell. In warmer kitchens (75°F+), check at 18 hours; in cooler kitchens it may need the full 24.", tip: "Don’t stir or disturb the batter during fermentation — you’ll collapse the bubbles that make the bread rise.", time: "20–24 hours" },
+      { num: 5, title: "Bake", text: "Preheat oven to 350°F. Line a 9×5 loaf pan with parchment paper. Gently pour the fermented batter in — don’t stir. Scatter seeds over the top if using. Bake 75–85 min until the top is dark golden and a toothpick inserted in the center comes out clean. The outside will look done well before the inside is — resist pulling it early.", time: "75–85 min" },
+      { num: 6, title: "Cool completely before slicing", text: "Cool in the pan 15 min, then lift out using the parchment paper. Cool completely on a rack — at least 45 min — before slicing. The interior is still setting as it cools. Toast slices before eating; it dramatically improves the texture and flavor.", time: "45 min" },
+    ],
   },
 
   // ── DESSERTS ──────────────────────────────────────────────────────────────
@@ -1558,13 +1592,61 @@ const WRITTEN = {
   // ── EXTERNAL ONLY (no written recipe, just sourceUrl) ─────────────────────
   "orange chicken (natural, lower sugar)": {
     id: "orange-chicken", section: "chicken", servings: 4,
-    sourceUrl: "https://gatherednutrition.com/no-sugar-added-paleo-orange-cashew-chicken/",
-    notes: "Steam a big batch of veg (peppers, onions, bok choy, carrots, shredded cabbage) and serve over rice. Use ground chicken and add tapioca or arrowroot to thicken the sauce. Skip the cashews.",
+    ingredients: [
+      { group: "Chicken", items: [
+        { amount: "1½ lbs", name: "Chicken breasts, cut into 1-inch cubes" },
+        { amount: "2 Tbsp", name: "Tapioca starch (or arrowroot)" },
+        { amount: "½ tsp", name: "Kosher salt" },
+        { amount: "3 cracks", name: "Black pepper" },
+      ]},
+      { group: "Orange Sauce", items: [
+        { amount: "⅓ cup", name: "Coconut aminos" },
+        { amount: "2 Tbsp", name: "Rice vinegar" },
+        { amount: "1 tsp", name: "Sesame oil" },
+        { amount: "2 Tbsp", name: "Tomato paste" },
+        { amount: "1", name: "Orange, juiced (about 3 Tbsp)" },
+        { amount: "3 cloves", name: "Garlic, finely minced" },
+        { amount: "½ tsp", name: "Ground ginger (or 1 tsp fresh grated)" },
+        { amount: "pinch", name: "Red pepper flakes" },
+      ]},
+      { group: "To Serve", items: [
+        { amount: "⅓ cup", name: "Raw cashews" },
+        { amount: "2 Tbsp", name: "Avocado oil, for cooking" },
+        { amount: "3 cups", name: "Steamed jasmine rice" },
+        { amount: "to garnish", name: "Green onions and sesame seeds" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Coat the chicken", text: "Pat chicken dry. Toss with tapioca starch, salt, and pepper until evenly coated. Tapioca starch creates a light, crispy exterior that also helps the sauce cling to every piece.", },
+      { num: 2, title: "Make the sauce", text: "Whisk together coconut aminos, rice vinegar, sesame oil, tomato paste, orange juice, garlic, ginger, and red pepper flakes. The tomato paste sounds surprising but it adds body and a subtle sweetness — don’t skip it.", },
+      { num: 3, title: "Sear the chicken", text: "Heat avocado oil in a large skillet over medium-high. Add chicken in a single layer and sear undisturbed 2–3 min until golden on the bottom. Flip and sear 2 more min. The starch coating needs direct contact with the hot pan — don’t stir too early.", time: "4–5 min" },
+      { num: 4, title: "Simmer in sauce", text: "Pour sauce over the chicken and add cashews. Reduce heat to medium. Stir occasionally and let the sauce bubble and thicken, 3–5 min — it should reduce to a glossy glaze that coats the chicken heavily.", tip: "Watch closely at the end — the sauce thickens fast and can burn if the heat is too high.", time: "3–5 min" },
+      { num: 5, title: "Serve", text: "Spoon over steamed jasmine rice. Garnish with sliced green onions and sesame seeds. Serve immediately — the crispy coating softens as it sits.", },
+    ],
   },
   "skin clarifying curry carrot soup": {
     id: "curry-carrot-soup", section: "sides", servings: 4,
-    sourceUrl: "https://bojongourmet.com/vegan-curried-carrot-soup-ginger-coconut-milk/",
-    notes: "Rob's Fav! Add ground chicken for protein. Steam carrots fully before blending or you'll have a bumpy soup. White potato makes it super creamy. Top with vegan or dairy yogurt — the lime squeeze is essential.",
+    ingredients: [
+      { group: "", items: [
+        { amount: "2 lbs", name: "Carrots (about 8 medium), peeled and roughly chopped" },
+        { amount: "1 large", name: "Yellow onion, roughly chopped" },
+        { amount: "1 Tbsp", name: "Fresh ginger, grated on a Microplane (about a 1-inch knob)" },
+        { amount: "4 cloves", name: "Garlic, roughly chopped" },
+        { amount: "2 tsp", name: "Madras curry powder" },
+        { amount: "½ tsp", name: "Ground turmeric" },
+        { amount: "2 Tbsp", name: "Ghee or coconut oil (use coconut oil for vegan)" },
+        { amount: "3 cups", name: "Low-sodium chicken or vegetable broth" },
+        { amount: "1 can (13.5 oz)", name: "Full-fat coconut milk, divided (¼ cup reserved for garnish)" },
+        { amount: "1 tsp", name: "Kosher salt, plus more to taste" },
+        { amount: "to serve", name: "Fresh lime juice, chopped cilantro, pumpkin seeds (optional)" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Sweat the aromatics", text: "Melt ghee or coconut oil in a large Dutch oven over medium heat. Add onion, ginger, curry powder, and turmeric. Cook, stirring frequently, 10–12 min until onion is very soft and the spices are fragrant and beginning to darken. Add garlic; cook 1 more min. Blooming the spices in fat is what drives the depth of this soup — don’t rush this step.", time: "10–12 min" },
+      { num: 2, title: "Add carrots & simmer", text: "Add carrots, salt, and broth. Bring to a boil, then reduce heat and simmer partially covered 25–30 min until carrots are completely tender — a fork should slide in with no resistance.", time: "25–30 min" },
+      { num: 3, title: "Add coconut milk & blend", text: "Remove from heat. Add all but ¼ cup of the coconut milk. Let the soup cool slightly (5 min), then purée completely smooth with an immersion blender, or in batches in a standing blender. Be careful with hot liquid in a standard blender — fill it only halfway and hold the lid down firmly.", tip: "Don’t boil after adding the coconut milk — high heat can cause it to separate and look grainy.", time: "5 min" },
+      { num: 4, title: "Season & serve", text: "Return to the stovetop over medium-low. Warm gently, stirring, until steaming. Taste and adjust salt. Ladle into bowls and drizzle with the reserved coconut milk. Squeeze lime juice over and scatter cilantro and pumpkin seeds if using." },
+    ],
   },
   "asian cucumber salad": {
     id: "cucumber-salad", section: "sides", servings: 2,
