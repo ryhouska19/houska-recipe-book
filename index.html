@@ -4,162 +4,1599 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Houska Family Recipe Book</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream: #faf6f0; --parchment: #f2ead8; --ink: #1c1410; --ink-light: #4a3728;
-    --rust: #b84c2b; --rust-light: #e8654a; --gold: #c4973a; --gold-light: #e8c06a;
-    --sage: #5c7a5c; --card-bg: #fff9f2; --border: #ddd3be;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--cream); color: var(--ink); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
-  header { background: var(--ink); color: var(--cream); padding: 2.5rem 2rem 2rem; text-align: center; position: relative; overflow: hidden; }
-  header::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(196,151,58,0.04) 40px, rgba(196,151,58,0.04) 41px); }
-  .header-eyebrow { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
-  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 400; line-height: 1.1; color: var(--cream); margin-bottom: 0.5rem; }
-  header h1 em { color: var(--gold-light); font-style: italic; }
-  .header-sub { font-size: 0.85rem; color: rgba(250,246,240,0.5); margin-top: 0.75rem; }
-  .header-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(196,151,58,0.2); }
-  .stat { text-align: center; }
-  .stat-num { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--gold-light); line-height: 1; }
-  .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(250,246,240,0.45); margin-top: 0.2rem; }
-  .controls { background: var(--parchment); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; position: sticky; top: 0; z-index: 100; }
-  .search-wrap { flex: 1; min-width: 180px; position: relative; }
-  .search-wrap input { width: 100%; padding: 0.55rem 0.75rem 0.55rem 2.2rem; border: 1.5px solid var(--border); border-radius: 6px; background: var(--card-bg); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--ink); outline: none; transition: border-color 0.2s; }
-  .search-wrap input:focus { border-color: var(--rust); }
-  .search-icon { position: absolute; left: 0.65rem; top: 50%; transform: translateY(-50%); color: var(--ink-light); opacity: 0.4; font-size: 0.85rem; }
-  .filter-group { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-  .filter-btn { padding: 0.4rem 0.9rem; border: 1.5px solid var(--border); border-radius: 20px; background: var(--card-bg); font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 500; color: var(--ink-light); cursor: pointer; transition: all 0.18s; }
-  .filter-btn:hover { border-color: var(--rust); color: var(--rust); }
-  .filter-btn.active { background: var(--rust); border-color: var(--rust); color: white; }
-  .diet-toggle { display: flex; gap: 0.3rem; padding: 0.25rem; background: var(--border); border-radius: 20px; }
-  .diet-btn { padding: 0.3rem 0.75rem; border: none; border-radius: 16px; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 500; color: var(--ink-light); cursor: pointer; transition: all 0.18s; }
-  .diet-btn.active { background: var(--sage); color: white; }
-  .refresh-btn { padding: 0.4rem 0.75rem; border: 1.5px solid var(--border); border-radius: 20px; background: var(--card-bg); font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 500; color: var(--ink-light); cursor: pointer; transition: all 0.18s; }
-  .refresh-btn:hover { border-color: var(--gold); color: var(--gold); }
-  .main { padding: 1.5rem; max-width: 1400px; margin: 0 auto; }
-  .results-count { font-size: 0.75rem; color: var(--ink-light); opacity: 0.6; margin-bottom: 1rem; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
-  .card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 1.25rem; cursor: pointer; transition: all 0.22s; position: relative; overflow: hidden; }
-  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--border); transition: background 0.2s; }
-  .card:hover { border-color: var(--rust); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(184,76,43,0.1); }
-  .card:hover::before { background: var(--rust); }
-  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
-  .card-category { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 500; padding: 0.2rem 0.55rem; border-radius: 3px; }
-  .cat-Main { background: rgba(184,76,43,0.1); color: var(--rust); }
-  .cat-Side { background: rgba(92,122,92,0.1); color: var(--sage); }
-  .cat-Dessert { background: rgba(196,151,58,0.12); color: var(--gold); }
-  .card-rating { font-size: 0.75rem; color: var(--gold); font-weight: 500; }
-  .card h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 400; line-height: 1.3; color: var(--ink); margin-bottom: 0.5rem; }
-  .card-chef { font-size: 0.72rem; color: var(--ink-light); opacity: 0.6; margin-bottom: 0.75rem; font-style: italic; }
-  .card-meta { display: flex; gap: 1rem; font-size: 0.72rem; color: var(--ink-light); opacity: 0.7; margin-bottom: 0.75rem; }
-  .card-badges { display: flex; gap: 0.3rem; flex-wrap: wrap; }
-  .badge { font-size: 0.6rem; font-weight: 500; padding: 0.15rem 0.45rem; border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase; }
-  .badge-gf { background: rgba(92,122,92,0.12); color: var(--sage); }
-  .badge-df { background: rgba(196,151,58,0.12); color: var(--gold); }
-  .badge-veg { background: rgba(92,122,92,0.18); color: var(--sage); }
-  .card-note { font-size: 0.72rem; color: var(--ink-light); opacity: 0.65; font-style: italic; margin-top: 0.6rem; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 0.6rem; }
-  .has-recipe { position: absolute; bottom: 0.8rem; right: 0.9rem; font-size: 0.6rem; color: var(--rust); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; }
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(28,20,16,0.65); backdrop-filter: blur(4px); z-index: 999; padding: 1.5rem; overflow-y: auto; }
-  .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
-  .modal { background: var(--cream); border-radius: 12px; max-width: 720px; width: 100%; margin: auto; overflow: hidden; box-shadow: 0 32px 80px rgba(0,0,0,0.3); animation: slideUp 0.28s ease; }
-  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  .modal-header { background: var(--ink); color: var(--cream); padding: 1.75rem 2rem 1.5rem; position: relative; }
-  .modal-category { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 0.5rem; }
-  .modal-header h2 { font-family: 'Playfair Display', serif; font-size: 1.65rem; font-weight: 400; line-height: 1.2; }
-  .modal-header-meta { display: flex; gap: 1.5rem; font-size: 0.75rem; color: rgba(250,246,240,0.55); margin-top: 0.75rem; flex-wrap: wrap; }
-  .modal-close { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.1); border: none; color: var(--cream); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
-  .modal-close:hover { background: rgba(255,255,255,0.2); }
-  .modal-badges { display: flex; gap: 0.4rem; margin-top: 0.75rem; flex-wrap: wrap; }
-  .modal-badge { font-size: 0.65rem; font-weight: 500; padding: 0.2rem 0.6rem; border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase; }
-  .modal-body { padding: 1.75rem 2rem; }
-  .modal-note { background: var(--parchment); border-left: 3px solid var(--gold); padding: 0.85rem 1rem; border-radius: 0 6px 6px 0; font-size: 0.82rem; font-style: italic; color: var(--ink-light); line-height: 1.6; margin-bottom: 1.5rem; }
-  .modal-section-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 400; color: var(--ink); margin-bottom: 0.85rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; }
-  .modal-section-title::before { content: ''; display: inline-block; width: 3px; height: 1em; background: var(--rust); border-radius: 2px; }
-  .ingredients-grid { display: grid; gap: 0.35rem; margin-bottom: 1.75rem; }
-  .ingredient-group-title { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--rust); font-weight: 500; margin-top: 0.75rem; margin-bottom: 0.35rem; }
-  .ingredient-row { display: flex; align-items: baseline; gap: 0.5rem; font-size: 0.83rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(221,211,190,0.5); line-height: 1.4; }
-  .ingredient-amount { font-weight: 500; color: var(--rust); min-width: 60px; font-size: 0.8rem; }
-  .ingredient-name { color: var(--ink); flex: 1; }
-  .steps-list { display: grid; gap: 1rem; margin-bottom: 1.75rem; }
-  .step { display: flex; gap: 1rem; align-items: flex-start; font-size: 0.85rem; line-height: 1.65; }
-  .step-num { background: var(--ink); color: var(--cream); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 500; flex-shrink: 0; margin-top: 0.1rem; }
-  .step-content { flex: 1; color: var(--ink-light); }
-  .step-title { font-weight: 500; color: var(--ink); font-size: 0.8rem; margin-bottom: 0.2rem; }
-  .step-time { font-size: 0.7rem; color: var(--rust); opacity: 0.7; margin-top: 0.2rem; font-style: italic; }
-  .no-recipe { background: var(--parchment); border-radius: 8px; padding: 1.5rem; text-align: center; color: var(--ink-light); font-size: 0.85rem; opacity: 0.7; font-style: italic; }
-  .empty-state { grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: var(--ink-light); }
-  .empty-state p:first-child { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 0.5rem; }
-  @media (max-width: 600px) { .controls { gap: 0.5rem; } .header-stats { gap: 1rem; } .modal-body { padding: 1.25rem; } .modal-header { padding: 1.25rem; } }
+:root {
+  --cream: #faf6f0;
+  --parchment: #f2ead8;
+  --parchment-dark: #e8dcc4;
+  --ink: #1c1410;
+  --ink-light: #4a3728;
+  --rust: #b84c2b;
+  --rust-light: #d4613d;
+  --gold: #c4973a;
+  --gold-light: #e8c06a;
+  --sage: #5c7a5c;
+  --card-bg: #fff9f2;
+  --border: #ddd3be;
+  --border-dark: #c8b89a;
+  --shadow: rgba(28,20,16,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: #2a1f14;
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem 4rem;
+}
+
+/* ── BOOK SHELL ─────────────────────────────────────────────── */
+.book {
+  width: 100%;
+  max-width: 860px;
+  background: var(--cream);
+  border-radius: 4px 12px 12px 4px;
+  box-shadow:
+    -6px 0 0 #1a110a,
+    0 0 0 1px #1a110a,
+    8px 8px 40px rgba(0,0,0,0.6),
+    inset -3px 0 8px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+/* spine */
+.book::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 18px;
+  background: linear-gradient(to right, #1a110a, #2d1f12 40%, #3d2a18 100%);
+  z-index: 10;
+}
+
+/* page-turn shadow */
+.book::after {
+  content: '';
+  position: absolute;
+  left: 18px; top: 0; bottom: 0;
+  width: 24px;
+  background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+  pointer-events: none;
+  z-index: 9;
+}
+
+/* ── COVER ──────────────────────────────────────────────────── */
+.cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  padding: 4rem 3rem 3rem;
+  background: var(--ink);
+  position: relative;
+  text-align: center;
+}
+
+.cover-border {
+  position: absolute;
+  inset: 1.5rem;
+  border: 1px solid rgba(196,151,58,0.3);
+  pointer-events: none;
+}
+.cover-border::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(196,151,58,0.15);
+}
+
+.cover-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.75rem;
+  font-weight: 500;
+}
+
+.cover h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--cream);
+}
+
+.cover h1 .line1 {
+  display: block;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+}
+
+.cover h1 .line2 {
+  display: block;
+  font-size: clamp(1.5rem, 4vw, 2.4rem);
+  font-style: italic;
+  color: var(--gold-light);
+  margin-top: 0.2rem;
+}
+
+.cover-divider {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  margin: 2rem auto;
+}
+
+.cover-sub {
+  font-size: 0.8rem;
+  color: rgba(250,246,240,0.45);
+  letter-spacing: 0.1em;
+  font-style: italic;
+}
+
+/* ── CONTROLS BAR ───────────────────────────────────────────── */
+.controls {
+  background: var(--parchment);
+  border-bottom: 1px solid var(--border-dark);
+  padding: 0.85rem 1.75rem 0.85rem 2.5rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.search-wrap {
+  flex: 1;
+  min-width: 160px;
+  position: relative;
+}
+
+.search-wrap input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+  border: 1px solid var(--border-dark);
+  border-radius: 5px;
+  background: var(--card-bg);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-wrap input:focus { border-color: var(--rust); }
+.search-icon {
+  position: absolute;
+  left: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-light);
+  opacity: 0.35;
+  font-size: 0.8rem;
+}
+
+.diet-toggle {
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.2rem;
+  background: var(--border);
+  border-radius: 20px;
+}
+.diet-btn {
+  padding: 0.3rem 0.8rem;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--ink-light);
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.04em;
+}
+.diet-btn.active { background: var(--sage); color: white; }
+
+/* ── TABLE OF CONTENTS ──────────────────────────────────────── */
+.toc {
+  padding: 3rem 2.5rem 3rem 3.5rem;
+}
+
+.toc-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.toc-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--ink);
+  letter-spacing: 0.05em;
+}
+
+.toc-header p {
+  font-size: 0.75rem;
+  color: var(--ink-light);
+  opacity: 0.6;
+  margin-top: 0.4rem;
+  font-style: italic;
+}
+
+.toc-section {
+  margin-bottom: 2rem;
+}
+
+.toc-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--rust);
+  margin-bottom: 0.1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.toc-subsection {
+  margin-top: 1rem;
+}
+
+.toc-subsection-title {
+  font-size: 0.62rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ink-light);
+  opacity: 0.55;
+  margin-bottom: 0.4rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid var(--border);
+}
+
+.toc-entry {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  padding: 0.38rem 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s;
+  position: relative;
+}
+.toc-entry:hover { background: var(--parchment); }
+.toc-entry.hidden { display: none; }
+
+.toc-entry-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--ink);
+  flex: 1;
+  line-height: 1.3;
+}
+
+.toc-dots {
+  flex: 1;
+  border-bottom: 1px dotted var(--border-dark);
+  margin: 0 0.5rem;
+  min-width: 20px;
+  position: relative;
+  top: -3px;
+}
+
+.toc-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.toc-time {
+  font-size: 0.7rem;
+  color: var(--ink-light);
+  opacity: 0.5;
+}
+
+.toc-badge {
+  font-size: 0.55rem;
+  font-weight: 500;
+  padding: 0.1rem 0.35rem;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.toc-gf { background: rgba(92,122,92,0.12); color: var(--sage); }
+.toc-df { background: rgba(196,151,58,0.12); color: var(--gold); }
+
+.toc-entry-chef {
+  font-size: 0.68rem;
+  color: var(--ink-light);
+  opacity: 0.45;
+  font-style: italic;
+  margin-left: 0.3rem;
+}
+
+/* ── RECIPE PAGE ────────────────────────────────────────────── */
+.recipe-page {
+  display: none;
+  padding: 3rem 2.5rem 3.5rem 3.5rem;
+  position: relative;
+}
+.recipe-page.active { display: block; }
+
+.recipe-back {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--ink-light);
+  opacity: 0.55;
+  cursor: pointer;
+  margin-bottom: 2rem;
+  transition: opacity 0.15s;
+  width: fit-content;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.recipe-back:hover { opacity: 1; color: var(--rust); }
+
+.recipe-header { margin-bottom: 2rem; }
+
+.recipe-section-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--rust);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.recipe-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.recipe-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 1rem;
+}
+
+.recipe-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: var(--parchment);
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+}
+
+.recipe-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.recipe-meta-label {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--ink-light);
+  opacity: 0.5;
+}
+.recipe-meta-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.recipe-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.recipe-badge {
+  font-size: 0.62rem;
+  font-weight: 500;
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.badge-gf { background: rgba(92,122,92,0.12); color: var(--sage); }
+.badge-df { background: rgba(196,151,58,0.12); color: var(--gold); }
+
+.recipe-note {
+  background: var(--parchment);
+  border-left: 3px solid var(--gold);
+  padding: 0.85rem 1.1rem;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--ink-light);
+  line-height: 1.65;
+  margin-bottom: 1.75rem;
+}
+
+/* two-column layout for ingredients + instructions */
+.recipe-body {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+@media (max-width: 600px) {
+  .recipe-body { grid-template-columns: 1fr; gap: 1.5rem; }
+  .toc { padding: 2rem 1.25rem 2rem 2rem; }
+  .recipe-page { padding: 2rem 1.25rem 2.5rem 2rem; }
+  .controls { padding: 0.75rem 1rem 0.75rem 1.5rem; }
+}
+
+.recipe-col-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.recipe-col-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background: var(--rust);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* serving adjuster */
+.serving-adjuster {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.75rem;
+  color: var(--ink-light);
+}
+.serving-label { opacity: 0.6; font-size: 0.72rem; }
+.serving-btn {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border-dark);
+  background: var(--card-bg);
+  color: var(--ink);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  line-height: 1;
+}
+.serving-btn:hover { border-color: var(--rust); color: var(--rust); }
+#serving-count {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--rust);
+  min-width: 1.2rem;
+  text-align: center;
+}
+
+.ingredient-group-title {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--rust);
+  font-weight: 500;
+  margin-top: 0.9rem;
+  margin-bottom: 0.3rem;
+  opacity: 0.8;
+}
+
+.ingredient-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  padding: 0.28rem 0;
+  border-bottom: 1px solid rgba(221,211,190,0.45);
+  line-height: 1.4;
+}
+.ingredient-amount {
+  font-weight: 500;
+  color: var(--rust);
+  min-width: 58px;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+.ingredient-name { color: var(--ink); flex: 1; }
+
+.steps-list { display: grid; gap: 0.85rem; }
+
+.step {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  font-size: 0.83rem;
+  line-height: 1.7;
+}
+.step-num {
+  background: var(--ink);
+  color: var(--cream);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+.step-content { flex: 1; }
+.step-title {
+  font-weight: 500;
+  color: var(--ink);
+  font-size: 0.78rem;
+  margin-bottom: 0.15rem;
+}
+.step-text { color: var(--ink-light); }
+.step-time {
+  font-size: 0.68rem;
+  color: var(--rust);
+  opacity: 0.7;
+  margin-top: 0.2rem;
+  font-style: italic;
+}
+.step-tip {
+  font-size: 0.72rem;
+  color: var(--gold);
+  opacity: 0.85;
+  margin-top: 0.18rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--rust);
+  color: white;
+  padding: 0.7rem 1.1rem;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
+  margin-top: 0.5rem;
+}
+.source-link:hover { background: var(--rust-light); }
+
+.no-results {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--ink-light);
+  opacity: 0.5;
+}
+.no-results p:first-child {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  margin-bottom: 0.4rem;
+}
+
+/* page footer */
+.page-footer {
+  padding: 1.25rem 2.5rem 1.25rem 3.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.65rem;
+  color: var(--ink-light);
+  opacity: 0.4;
+  letter-spacing: 0.08em;
+}
 </style>
 </head>
 <body>
-<header>
-  <div class="header-eyebrow">Est. Family Kitchen</div>
-  <h1>Houska Family <em>Recipe Book</em></h1>
-  <div class="header-sub">The best of family recipes...and the internet.</div>
-  <div class="header-stats">
-    <div class="stat"><div class="stat-num" id="total-count">—</div><div class="stat-label">Recipes</div></div>
-    <div class="stat"><div class="stat-num" id="gf-count">—</div><div class="stat-label">GF-Optional</div></div>
+
+<div class="book">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-border"></div>
+    <h1>
+      <span class="line1">Houska Family</span>
+      <span class="line2">Recipe Book</span>
+    </h1>
+    <div class="cover-divider"></div>
+    <div class="cover-sub">The best of family recipes&hellip; and the internet.</div>
   </div>
-</header>
-<div class="controls">
-  <div class="search-wrap">
-    <span class="search-icon">⌕</span>
-    <input type="text" id="search" placeholder="Search recipes, ingredients, notes…" oninput="filterRecipes()">
-  </div>
-  <div class="filter-group" id="cat-filters">
-    <button class="filter-btn active" onclick="setCat('all',this)">All</button>
-    <button class="filter-btn" onclick="setCat('Main',this)">Mains</button>
-    <button class="filter-btn" onclick="setCat('Side',this)">Sides</button>
-    <button class="filter-btn" onclick="setCat('Dessert',this)">Desserts</button>
-  </div>
-  <div class="diet-toggle">
-    <button class="diet-btn" id="btn-gf" onclick="toggleDiet('gf')">GF</button>
-    <button class="diet-btn" id="btn-df" onclick="toggleDiet('df')">DF</button>
-    <button class="diet-btn" id="btn-veg" onclick="toggleDiet('veg')">Veg</button>
-  </div>
-  <button class="refresh-btn" onclick="loadFromSheet()">↻ Refresh</button>
-</div>
-<div class="main">
-  <div class="results-count" id="results-count"></div>
-  <div class="grid" id="grid"></div>
-</div>
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <button class="modal-close" onclick="closeModalDirect()">✕</button>
-      <div class="modal-category" id="m-cat"></div>
-      <h2 id="m-name"></h2>
-      <div class="modal-badges" id="m-badges"></div>
-      <div class="modal-header-meta" id="m-meta"></div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search" placeholder="Search recipes&hellip;" oninput="filterTOC()">
     </div>
-    <div class="modal-body" id="m-body"></div>
+    <div class="diet-toggle">
+      <button class="diet-btn" id="btn-gf" onclick="toggleDiet('gf')">GF</button>
+      <button class="diet-btn" id="btn-df" onclick="toggleDiet('df')">DF</button>
+    </div>
   </div>
-</div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc" id="toc">
+    <div class="toc-header">
+      <h2>Table of Contents</h2>
+      <p>Click any recipe to open it</p>
+    </div>
+    <div id="toc-body"></div>
+    <div class="no-results" id="no-results" style="display:none">
+      <p>No recipes found</p>
+      <p>Try a different search or filter</p>
+    </div>
+  </div>
+
+  <!-- RECIPE PAGE (hidden until a recipe is opened) -->
+  <div class="recipe-page" id="recipe-page">
+    <div class="recipe-back" onclick="closePage()">← Table of Contents</div>
+    <div class="recipe-header">
+      <div class="recipe-section-label" id="r-section"></div>
+      <h2 class="recipe-title" id="r-title"></h2>
+      <div class="recipe-meta-row" id="r-meta"></div>
+      <div class="recipe-badges" id="r-badges" style="margin-bottom:0.75rem"></div>
+    </div>
+    <div class="recipe-note" id="r-note" style="display:none"></div>
+    <div class="recipe-body" id="r-body"></div>
+  </div>
+
+  <div class="page-footer">
+    <span>Houska Family Recipe Book</span>
+    <span id="footer-count"></span>
+  </div>
+
+</div><!-- /book -->
 
 <script>
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT8h2NVT0qZHt7jxJJpL8p1mcAzJrQyDGSY6H6hh4ja3OLp23t8tTV38RYDkNkvxD00Z9cKaJVIzSRA/pub?output=csv';
 
-// Full hand-written recipes — matched to sheet rows by recipe name
+// ─── STRUCTURE ────────────────────────────────────────────────────────────────
+const SECTIONS = [
+  { key: 'beef',     label: 'Beef',          parent: 'Mains' },
+  { key: 'chicken',  label: 'Chicken',       parent: 'Mains' },
+  { key: 'fish',     label: 'Fish & Seafood',parent: 'Mains' },
+  { key: 'seafood',  label: 'Fish & Seafood',parent: 'Mains' },
+  { key: 'sides',    label: 'Sides & Salads',parent: 'Sides & Salads' },
+  { key: 'desserts', label: 'Desserts',      parent: 'Desserts' },
+];
+
+// ─── FULL RECIPES ─────────────────────────────────────────────────────────────
 const WRITTEN = {
-  "grandma's meat sauce": { id:"meat-sauce", ingredients:[{group:"Meats",items:[{amount:"4 lbs",name:"Ground Sirloin (or Ground Chicken)"},{amount:"1.5 lbs",name:"Mild/Spicy Sausage"}]},{group:"Produce",items:[{amount:"6 cloves",name:"Garlic, chopped"},{amount:"1 medium",name:"Yellow onion, diced"}]},{group:"Canned / Jarred",items:[{amount:"2 × 28oz",name:"Crushed Tomatoes"},{amount:"3 × 28oz",name:"Tomato Puree"},{amount:"1 × 12oz",name:"Tomato Paste"}]},{group:"Spices",items:[{amount:"2 Tbsp",name:"Dried Basil"},{amount:"1 Tbsp",name:"Dried Oregano"},{amount:"1 tsp",name:"Red Pepper Flakes"},{amount:"to taste",name:"Salt & Pepper"}]},{group:"Other",items:[{amount:"2 oz",name:"Semi-Sweet or Dark Chocolate"},{amount:"few dashes",name:"Tabasco"}]}],steps:[{num:1,title:"Brown the meats",text:"Brown sirloin and sausage in EVOO in a large stock pot. Drain grease."},{num:2,title:"Sauté aromatics",text:"Sauté onions until softened. Add garlic and cook 1 minute more."},{num:3,title:"Combine",text:"Add onion and garlic to the meat pot."},{num:4,title:"Build the sauce",text:"Add crushed tomatoes, tomato puree, tomato paste, all spices, tabasco, and chocolate."},{num:5,title:"Simmer",text:"Bring to a boil, then reduce to a low simmer. Cook at least 2 hours.",time:"2 hours"},{num:6,title:"Adjust & serve",text:"Taste and adjust seasonings. Serve over pasta or GF noodles."}] },
-  "nyt short ribs": { id:"short-ribs", ingredients:[{group:"Meat",items:[{amount:"5 lbs",name:"Bone-in short ribs, at least 1½ inches thick"}]},{group:"Produce",items:[{amount:"2 heads",name:"Garlic, halved crosswise"},{amount:"1 medium",name:"Onion, chopped"},{amount:"4 ribs",name:"Celery, chopped"},{amount:"2 medium",name:"Carrots, chopped"},{amount:"1 cup",name:"Fresh parsley, coarsely chopped"},{amount:"½ cup",name:"Chives, finely chopped"},{amount:"1 Tbsp",name:"Lemon zest"},{amount:"4 sprigs",name:"Fresh thyme"}]},{group:"Pantry",items:[{amount:"3 Tbsp",name:"Tomato paste"},{amount:"2 cups",name:"Beef stock or bone broth"},{amount:"glug",name:"Red wine"},{amount:"to taste",name:"Kosher salt & pepper"}]}],steps:[{num:1,title:"Sear the ribs",text:"Heat oven to 275°F. Sear ribs in batches 6–8 min per batch until deeply browned.",time:"20–30 min"},{num:2,title:"Build the base",text:"Sauté garlic, onion, celery, carrots. Add tomato paste and caramelize.",time:"15 min"},{num:3,title:"Deglaze & add liquid",text:"Add red wine, scraping up browned bits. Add beef stock and thyme. Nestle ribs back in bone-side up."},{num:4,title:"Braise",text:"Cover and transfer to oven. Cook 3½ to 4 hours.",time:"3½–4 hours"},{num:5,title:"Rest & finish",text:"Remove ribs. Strain sauce and skim fat. Scatter parsley, chives, and lemon zest over ribs."}] },
-  "turmeric ginger lemon chicken stew": { id:"chicken-stew", ingredients:[{group:"Stew",items:[{amount:"4 lbs",name:"Boneless skinless chicken thighs"},{amount:"2 Tbsp",name:"Garlic-infused olive oil"},{amount:"2 Tbsp",name:"Fresh grated ginger"},{amount:"2 tsp",name:"Turmeric"},{amount:"1.5 tsp",name:"Sea salt"},{amount:"1.5 cups",name:"Jasmine or basmati rice"},{amount:"6 cups",name:"Chicken bone broth"},{amount:"3 whole",name:"Carrots, sliced"},{amount:"2",name:"Bay leaves"},{amount:"1 tsp",name:"Dijon mustard"},{amount:"2 Tbsp",name:"Fresh lemon juice"},{amount:"1 Tbsp",name:"Ghee"}]}],steps:[{num:1,title:"Sear chicken",text:"Sear thighs 3–4 min per side in a Dutch oven. Remove and set aside.",time:"8 min"},{num:2,title:"Bloom spices",text:"Add ginger and turmeric. Stir until fragrant.",time:"1–2 min"},{num:3,title:"Build base",text:"Add rice, carrots, bay leaves, and Dijon. Stir to coat."},{num:4,title:"Simmer",text:"Add broth. Return chicken. Cover and simmer on low until rice is tender.",time:"25–30 min"},{num:5,title:"Shred & finish",text:"Remove bay leaves. Shred chicken. Stir in lemon juice and ghee. Adjust seasoning."}] },
-  "reverse-seared ribeye": { id:"ribeye", ingredients:[{group:"Steak",items:[{amount:"1 steak",name:"Ribeye, 1.5–2 inch thick"},{amount:"liberal",name:"Kosher salt (dry brine)"},{amount:"to taste",name:"Fresh cracked pepper"}]},{group:"For the Sear",items:[{amount:"1–2 tsp",name:"Avocado oil"},{amount:"1 Tbsp",name:"Ghee (optional)"},{amount:"1–2 sprigs",name:"Rosemary or thyme (optional)"},{amount:"1 clove",name:"Garlic, smashed (optional)"}]}],steps:[{num:1,title:"Dry brine",text:"Salt steak heavily on all sides. Place uncovered on a rack in the fridge.",time:"8–24 hours ahead"},{num:2,title:"Low & slow",text:"Preheat oven to 200°F. Bake on a rack until internal temp reaches 110–115°F.",time:"45–75 min"},{num:3,title:"Rest",text:"Remove from oven and rest before searing.",time:"10 min"},{num:4,title:"Sear",text:"Superheat cast iron with avocado oil. Sear 60–90 seconds per side. Add ghee, herbs, garlic. Render fat cap 20–30 seconds.",time:"3–4 min"},{num:5,title:"Pull & rest",text:"Remove at 125–128°F for medium-rare. Rest before slicing.",time:"5–8 min"}] },
-  "mike's hot honey garlic roasted chicken thighs": { id:"hot-honey-chicken", ingredients:[{group:"Chicken",items:[{amount:"4 lbs",name:"Bone-in skin-on chicken thighs"},{amount:"1 tsp each",name:"Smoked paprika, garlic powder, onion powder"},{amount:"to taste",name:"Kosher salt & black pepper"}]},{group:"Glaze",items:[{amount:"3 Tbsp",name:"Mike's Hot Honey"},{amount:"4 cloves",name:"Garlic, minced"},{amount:"2 Tbsp",name:"Soy sauce (or tamari for GF)"},{amount:"1 Tbsp",name:"Unsalted butter"},{amount:"1 tsp",name:"Rice vinegar or apple cider vinegar"}]}],steps:[{num:1,title:"Dry brine",text:"Season thighs on all sides. Rest uncovered on a rack in fridge 30 min or overnight.",time:"30 min – overnight"},{num:2,title:"Sear",text:"Cast iron over medium. Sear skin-side down 7–8 min until golden. Flip and sear flesh side 2 min.",time:"9–10 min"},{num:3,title:"Roast",text:"Transfer to 425°F oven skin-side up until 190–195°F internal.",time:"20–25 min"},{num:4,title:"Make the glaze",text:"Melt butter. Sauté garlic 1–2 min. Add honey, soy sauce, vinegar. Simmer until slightly thickened.",time:"6–8 min"},{num:5,title:"Glaze & finish",text:"Brush glaze on skin in last 5–7 min. Watch closely — honey burns fast. Rest 5–10 min.",time:"5–10 min"}] },
-  "coconut jasmine rice": { id:"coconut-rice", ingredients:[{group:"",items:[{amount:"1.5 cups",name:"Jasmine rice"},{amount:"1 can (13.5oz)",name:"Full-fat coconut milk"},{amount:"¾ cup",name:"Water or chicken stock"},{amount:"½ tsp",name:"Salt"}]}],steps:[{num:1,title:"Combine",text:"Rinse rice once. Combine with coconut milk, water or stock, and salt in a saucepan."},{num:2,title:"Boil & simmer",text:"Bring to a boil, reduce to the lowest simmer, cover tightly and cook 15 minutes.",time:"15 min"},{num:3,title:"Steam & serve",text:"Remove from heat. Leave covered 10 minutes undisturbed. Fluff and serve.",time:"10 min"}] },
-  "high-protein minestrone": { id:"minestrone", ingredients:[{group:"Protein",items:[{amount:"2 lbs",name:"Italian sausage, removed from casing"},{amount:"1.5 lbs",name:"Boneless skinless chicken breasts"}]},{group:"Base",items:[{amount:"1 large",name:"Yellow onion, diced"},{amount:"3 whole",name:"Carrots, diced"},{amount:"3 ribs",name:"Celery, diced"},{amount:"4 cloves",name:"Garlic, minced"},{amount:"2 Tbsp",name:"Tomato paste"}]},{group:"Liquid & Vegetables",items:[{amount:"10–12 cups",name:"Chicken stock, low sodium"},{amount:"1 × 28oz",name:"Crushed tomatoes"},{amount:"2 medium",name:"Zucchini, diced"},{amount:"1.5 cups",name:"Green beans, chopped"},{amount:"3 cups",name:"Spinach or kale"},{amount:"2 × 15oz",name:"Cannellini beans, drained"},{amount:"1.5 cups",name:"Ditalini pasta (optional)"}]},{group:"Seasoning",items:[{amount:"2 tsp",name:"Dried oregano"},{amount:"1 rind",name:"Parmesan rind (optional)"},{amount:"1–2 Tbsp",name:"Fresh lemon juice"}]}],steps:[{num:1,title:"Brown sausage",text:"Brown sausage in a Dutch oven. Remove and set aside.",time:"8–10 min"},{num:2,title:"Sauté base",text:"Cook onion, carrot, and celery. Add garlic and tomato paste.",time:"7 min"},{num:3,title:"Add liquid",text:"Add stock, tomatoes, oregano, and parmesan rind. Bring to a simmer."},{num:4,title:"Poach & shred chicken",text:"Add chicken breasts. Poach until 165°F. Remove, shred, and return to pot.",time:"15 min"},{num:5,title:"Add beans & veg",text:"Add cannellini beans, zucchini, green beans, and pasta if using.",time:"10–12 min"},{num:6,title:"Finish",text:"Stir in spinach until wilted. Remove parmesan rind. Add lemon juice."}] },
-  "gumbo with chicken & andouille sausage": { id:"gumbo", ingredients:[{group:"Proteins & Stock",items:[{amount:"2 lbs",name:"Boneless/skinless chicken thighs"},{amount:"1 lb",name:"Andouille sausage (GF/DF)"},{amount:"10 cups",name:"Chicken broth, low-sodium"}]},{group:"Vegetables",items:[{amount:"2 cups each",name:"Celery, green bell pepper, yellow onion — diced"},{amount:"1 cup",name:"Tomatoes, diced"},{amount:"6 cloves",name:"Garlic, minced"},{amount:"1 cup",name:"Okra, sliced (optional)"}]},{group:"Seasonings",items:[{amount:"2 Tbsp",name:"Smoked paprika"},{amount:"1 Tbsp each",name:"Cayenne, black pepper, salt, oregano, thyme"},{amount:"2 Tbsp",name:"Worcestershire sauce (GF/DF)"},{amount:"2",name:"Bay leaves"},{amount:"1 tsp",name:"Gumbo filé powder (optional)"}]}],steps:[{num:1,title:"Sear proteins",text:"Sear chicken thighs 3–4 min per side and sausage slices 2 min per side. Remove both."},{num:2,title:"Roux substitute",text:"Add olive oil and flour. Stir continuously until golden brown.",time:"3–5 min"},{num:3,title:"Sauté vegetables",text:"Add all vegetables and cook until softened.",time:"7 min"},{num:4,title:"Build & simmer",text:"Return proteins. Add seasonings, Worcestershire, bay leaves, and broth. Simmer covered.",time:"45 min"},{num:5,title:"Shred & finish",text:"Shred chicken and return to pot. Add filé powder. Serve over rice."}] },
-  "chicken piccata meatballs": { id:"piccata-meatballs", ingredients:[{group:"Meatballs",items:[{amount:"2 lbs",name:"Ground chicken"},{amount:"¾ cup",name:"Breadcrumbs (GF panko works)"},{amount:"2",name:"Eggs"},{amount:"4 cloves",name:"Garlic, minced"},{amount:"4 Tbsp",name:"Parsley, chopped"},{amount:"2 tsp",name:"Lemon zest"},{amount:"1 tsp",name:"Salt"}]},{group:"Piccata Sauce",items:[{amount:"2 cups",name:"Chicken broth"},{amount:"¼ cup",name:"Fresh lemon juice (~4 lemons)"},{amount:"4 Tbsp",name:"Capers"},{amount:"2 tsp",name:"Dijon mustard"},{amount:"4 tsp",name:"Cornstarch or arrowroot"},{amount:"2 handfuls",name:"Spinach (optional)"}]}],steps:[{num:1,title:"Bake meatballs",text:"Preheat oven to 400°F. Mix, form, and bake meatballs until 165°F.",time:"15–18 min"},{num:2,title:"Build sauce",text:"Sauté garlic. Add broth, lemon juice, capers, and Dijon. Simmer 3–5 min.",time:"5–7 min"},{num:3,title:"Thicken",text:"Stir cornstarch slurry into sauce. Add spinach if using."},{num:4,title:"Serve",text:"Toss meatballs in sauce. Serve over pasta, spaghetti squash, or rice."}] },
-  "korean beef bowls (bulgogi-style)": { id:"korean-beef", ingredients:[{group:"Sauce",items:[{amount:"3 Tbsp",name:"Soy sauce"},{amount:"1 Tbsp",name:"Sesame oil"},{amount:"2 Tbsp",name:"Brown sugar"},{amount:"4 cloves",name:"Garlic, minced"},{amount:"1 tsp",name:"Fresh ginger, grated"},{amount:"½ tsp",name:"Red pepper flakes"}]},{group:"Bowl",items:[{amount:"1 lb",name:"Ground beef"},{amount:"2 heads",name:"Bok choy, roughly chopped"},{amount:"3 cups",name:"Cooked white rice"},{amount:"to taste",name:"Green onions & sesame seeds, for topping"}]}],steps:[{num:1,title:"Make sauce",text:"Mix all sauce ingredients together and set aside."},{num:2,title:"Cook beef",text:"Cook ground beef over medium-high. Let sit undisturbed to build crispy bits. Drain excess fat.",time:"7 min"},{num:3,title:"Caramelize & veg",text:"Pour sauce over beef and caramelize 2 min. Add bok choy until wilted.",time:"3 min"},{num:4,title:"Serve",text:"Serve over rice. Top with green onions, sesame seeds, and a fried egg if desired."}] },
-  "asian cucumber salad": { id:"cucumber-salad", ingredients:[{group:"",items:[{amount:"2",name:"Persian or English cucumbers"},{amount:"½ tsp",name:"Kosher salt"},{amount:"1½ Tbsp",name:"Rice vinegar"},{amount:"1 tsp",name:"Sesame oil"},{amount:"½ tsp",name:"Soy sauce or tamari"},{amount:"½ tsp",name:"Sugar or honey"},{amount:"1 clove",name:"Garlic, finely grated"},{amount:"1 tsp",name:"Sesame seeds"},{amount:"2",name:"Green onions, thinly sliced"},{amount:"½ tsp",name:"Red pepper flakes (optional)"}]}],steps:[{num:1,title:"Salt the cucumbers",text:"Slice cucumbers thin. Toss with salt and let sit in a colander 10 minutes.",time:"10 min"},{num:2,title:"Make the dressing",text:"Whisk together rice vinegar, sesame oil, soy sauce, sugar, and garlic."},{num:3,title:"Combine & serve",text:"Pat cucumbers dry. Toss with dressing, green onions, and red pepper flakes. Rest 5 min. Top with sesame seeds.",time:"5 min"}] },
+
+  // ── BEEF ──────────────────────────────────────────────────────────────────
+
+  "filet mignon with mushroom red wine sauce": {
+    id: "filet-mignon", section: "beef", servings: 4,
+    ingredients: [
+      { group: "Steaks", items: [
+        { amount: "4 (6oz)", name: "Filet mignon, about 1½ inches thick" },
+        { amount: "to taste", name: "Kosher salt & black pepper" },
+      ]},
+      { group: "Mushroom Wine Sauce", items: [
+        { amount: "16 oz", name: "Baby bella mushrooms, thickly sliced" },
+        { amount: "1 small", name: "Yellow onion, finely diced" },
+        { amount: "4 cloves", name: "Garlic, minced" },
+        { amount: "1 Tbsp", name: "Fresh thyme, minced (or 1 tsp dried)" },
+        { amount: "½ cup", name: "Dry red wine — Merlot or Cabernet" },
+        { amount: "1½ cups", name: "Low-sodium beef broth" },
+        { amount: "½ cup", name: "Heavy cream" },
+        { amount: "4 Tbsp", name: "Unsalted butter, divided" },
+        { amount: "2 Tbsp", name: "Olive oil, divided" },
+        { amount: "to taste", name: "Salt & pepper" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Build the mushroom base", text: "Melt 2 Tbsp butter with 1 Tbsp olive oil in a large heavy skillet over medium-high. Add mushrooms in a single layer — resist stirring for 3 minutes so they brown rather than steam. Add onion and cook 3 more minutes. Press in garlic, add thyme, season with salt and pepper, and cook 2 minutes until fragrant. Transfer to a plate.", time: "10 min" },
+      { num: 2, title: "Sear the steaks", text: "Wipe the skillet clean. Pat steaks completely dry — moisture is the enemy of a good sear. Season generously on all sides. Add remaining butter and oil over medium-high. When butter foam subsides, add steaks. Sear 3–5 min per side for medium-rare (125°F). Transfer to a plate and tent loosely with foil.", time: "6–10 min" },
+      { num: 3, title: "Build the sauce", text: "In the same skillet over medium-high, pour in wine. Scrape every browned bit from the bottom — that's flavor. Simmer until reduced by half, about 3 minutes. Add beef broth and boil until roughly ⅔ cup of liquid remains, 5–7 minutes.", time: "8–10 min" },
+      { num: 4, title: "Finish & serve", text: "Stir in cream and boil 2 minutes until slightly thickened. Season to taste. Return steaks and mushrooms to the pan, spooning sauce over the top. Once just heated through, plate immediately. Garnish with fresh thyme.", time: "3 min" },
+    ]
+  },
+
+  "dutch oven pot roast": {
+    id: "pot-roast", section: "beef", servings: 6,
+    ingredients: [
+      { group: "Roast", items: [
+        { amount: "3–4 lbs", name: "Beef chuck roast" },
+        { amount: "2 Tbsp", name: "Olive oil" },
+        { amount: "to taste", name: "Kosher salt & black pepper" },
+      ]},
+      { group: "Aromatics & Vegetables", items: [
+        { amount: "2 large", name: "Yellow onions, cut into thick slices" },
+        { amount: "6 cloves", name: "Garlic, minced" },
+        { amount: "3 large", name: "Carrots, cut into 2-inch pieces" },
+        { amount: "3 large", name: "Yukon Gold potatoes, quartered" },
+        { amount: "3 ribs", name: "Celery, cut into 2-inch pieces" },
+      ]},
+      { group: "Braising Liquid", items: [
+        { amount: "2 Tbsp", name: "Tomato paste" },
+        { amount: "½ cup", name: "Dry red wine" },
+        { amount: "1½ cups", name: "Beef broth" },
+        { amount: "1 Tbsp", name: "Worcestershire sauce" },
+        { amount: "3 sprigs", name: "Fresh thyme" },
+        { amount: "2 sprigs", name: "Fresh rosemary" },
+        { amount: "2", name: "Bay leaves" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Season & preheat", text: "Preheat oven to 300°F. Pat chuck roast completely dry and season every surface aggressively with salt and pepper. Don't hold back — a thick roast needs more seasoning than you think." },
+      { num: 2, title: "Deep sear", text: "Heat olive oil in a large Dutch oven over medium-high until shimmering. Sear roast 4–5 minutes per side on all surfaces, including the ends, until deeply browned. This isn't just about color — it builds the foundation of the entire braise. Remove to a plate.", time: "12–15 min" },
+      { num: 3, title: "Caramelize the base", text: "In the same pot, add onions. Cook 5–7 minutes until golden at the edges. Add garlic and tomato paste, stirring constantly for 2 minutes until the paste darkens and smells sweet. Darkening the paste removes bitterness and adds depth.", time: "8 min" },
+      { num: 4, title: "Deglaze", text: "Pour in red wine and scrape every bit from the bottom — those fond particles dissolve into the sauce. Simmer 2–3 minutes. Add beef broth and Worcestershire.", time: "3 min" },
+      { num: 5, title: "Braise low & slow", text: "Return roast to the pot with carrots, potatoes, celery, thyme, rosemary, and bay leaves. Liquid should reach halfway up the roast; add a splash more broth if needed. Bring to a simmer, cover tightly, and transfer to oven. Cook undisturbed.", time: "3–3½ hours" },
+      { num: 6, title: "Rest & serve", text: "The roast is done when it pulls apart effortlessly with two forks. Remove herbs. Taste the braising liquid and season to taste — it's your sauce. Shred or slice and serve over vegetables, spooning pan juices generously over everything." },
+    ]
+  },
+
+  "nyt short ribs": {
+    id: "short-ribs", section: "beef", servings: 4,
+    ingredients: [
+      { group: "Ribs", items: [
+        { amount: "5 lbs", name: "Bone-in short ribs, at least 1½ inches thick" },
+        { amount: "2 Tbsp", name: "Vegetable oil" },
+        { amount: "to taste", name: "Kosher salt & pepper" },
+      ]},
+      { group: "Braise", items: [
+        { amount: "2 heads", name: "Garlic, halved crosswise" },
+        { amount: "1 medium", name: "Onion, chopped" },
+        { amount: "4 ribs", name: "Celery, chopped" },
+        { amount: "2 medium", name: "Carrots, chopped" },
+        { amount: "3 Tbsp", name: "Tomato paste" },
+        { amount: "glug", name: "Red wine" },
+        { amount: "2 cups", name: "Beef stock or bone broth" },
+        { amount: "4 sprigs", name: "Fresh thyme" },
+        { amount: "to taste", name: "Kosher salt & pepper" },
+      ]},
+      { group: "Finish", items: [
+        { amount: "1 cup", name: "Fresh parsley, coarsely chopped" },
+        { amount: "½ cup", name: "Chives, finely chopped" },
+        { amount: "1 Tbsp", name: "Lemon zest, finely grated" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Sear the ribs", text: "Preheat oven to 275°F. Season short ribs generously. Heat oil in a large Dutch oven over medium-high. Working in batches to avoid crowding, sear 6–8 minutes per batch until deeply browned on all sides. Crowding steams the meat — take your time. Transfer to a plate.", time: "20–25 min" },
+      { num: 2, title: "Build the aromatic base", text: "In the same pot, place garlic cut-side down. Cook 1–2 minutes until golden. Add onion, celery, and carrots. Season, and cook 5–10 minutes until softened and beginning to caramelize. Add tomato paste and stir constantly 2–3 minutes until it darkens to a brick red.", time: "15 min" },
+      { num: 3, title: "Deglaze & build the braise", text: "Add red wine, scraping up every browned bit. Simmer 2–3 minutes. Add beef stock and thyme. Nestle short ribs back in the pot bone-side up — this position keeps the meat submerged and self-basting. Add more stock if needed to mostly submerge the ribs.", time: "5 min" },
+      { num: 4, title: "Braise", text: "Bring to a simmer. Cover and transfer to oven. Cook undisturbed — the low, even heat of the oven produces a gentler, more consistent braise than the stovetop.", time: "3½–4 hours" },
+      { num: 5, title: "Rest & finish", text: "Transfer ribs carefully to a platter — the meat will be very tender. Strain braising liquid through a fine mesh sieve and skim any fat from the surface. Season sauce to taste. Scatter parsley, chives, and lemon zest over the ribs and serve with sauce alongside." },
+    ]
+  },
+
+  "reverse-seared ribeye": {
+    id: "ribeye", section: "beef", servings: 1,
+    ingredients: [
+      { group: "Steak", items: [
+        { amount: "1 steak", name: "Ribeye, 1½–2 inches thick (Prime or Choice)" },
+        { amount: "liberal", name: "Kosher salt — for dry brine" },
+        { amount: "to taste", name: "Fresh cracked black pepper" },
+      ]},
+      { group: "For the Sear", items: [
+        { amount: "1–2 tsp", name: "Avocado oil — high smoke point" },
+        { amount: "1 Tbsp", name: "Unsalted butter or ghee (optional)" },
+        { amount: "1–2 sprigs", name: "Fresh rosemary or thyme (optional)" },
+        { amount: "1 clove", name: "Garlic, smashed (optional)" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Dry brine the night before", text: "Salt steak generously on all sides — don't be shy. Place uncovered on a wire rack in the fridge. The salt draws moisture to the surface, then it reabsorbs, seasoning the meat deeply. A 24-hour brine produces the best crust when seared.", time: "8–24 hours ahead" },
+      { num: 2, title: "Bring to temp & bake", text: "Pull steak from fridge 30 minutes before cooking. Preheat oven to 200°F. Place on a rack over a sheet pan and bake until internal temp reaches 110–115°F for medium-rare. The low oven ensures perfectly edge-to-edge even cooking.", time: "45–75 min" },
+      { num: 3, title: "Rest before searing", text: "Remove from oven. Rest on the counter while the pan heats up. The surface needs to be dry — pat with a paper towel if needed.", time: "10 min" },
+      { num: 4, title: "Ripping-hot sear", text: "Heat a cast iron or steel pan over medium-high for 2–3 minutes until very hot. Add avocado oil — it should shimmer immediately. Lay steak down and do not touch it. Sear 60–90 seconds per side. Add butter, herbs, and garlic if using, tilting pan to baste.", time: "3–4 min" },
+      { num: 5, title: "Render fat cap & rest", text: "Hold steak upright with tongs against the hot pan to render the fat cap 20–30 seconds. Pull at 125°F for medium-rare. Rest on a cutting board 5–8 minutes — resting lets the juices redistribute instead of running out when you cut.", time: "5–8 min" },
+    ]
+  },
+
+  "smashburger with easy sauce": {
+    id: "smashburger", section: "beef", servings: 4,
+    ingredients: [
+      { group: "Burgers", items: [
+        { amount: "1½ lbs", name: "Ground beef, 80/20 — divided into 8 × 3oz balls" },
+        { amount: "4", name: "Brioche or potato buns" },
+        { amount: "4 slices", name: "American or cheddar cheese" },
+        { amount: "2 cups", name: "Iceberg lettuce, finely shredded" },
+        { amount: "1 large", name: "Tomato, sliced thin" },
+        { amount: "½", name: "Red onion, shaved thin" },
+        { amount: "12 slices", name: "Dill pickles" },
+        { amount: "2 Tbsp", name: "Unsalted butter, for toasting buns" },
+        { amount: "to taste", name: "Kosher salt, pepper, garlic powder" },
+      ]},
+      { group: "Easy Sauce", items: [
+        { amount: "⅓ cup", name: "Mayonnaise" },
+        { amount: "1 tsp", name: "Yellow mustard" },
+        { amount: "1 tsp", name: "Dill pickle brine" },
+        { amount: "pinch", name: "Smoked paprika & cayenne" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Make sauce & prep", text: "Stir all sauce ingredients together and refrigerate — it improves as it sits. Form ground beef into 8 loose 3oz balls; don't pack tightly. Keep refrigerated until cooking — cold fat smashes into a better crust than warm fat. Prep all toppings." },
+      { num: 2, title: "Toast buns", text: "Butter cut sides of buns and toast on the griddle over medium until deeply golden. Set aside.", time: "2 min" },
+      { num: 3, title: "Smash & sear", text: "Increase heat to medium-high. Place 2–4 balls on the hot surface. Working quickly, place a square of parchment paper over each ball and press firmly straight down with a heavy spatula or burger press until very thin — about ¼ inch. Season immediately with salt, pepper, and garlic powder. Cook undisturbed until the edges are lacy and deeply browned.", time: "2–3 min" },
+      { num: 4, title: "Flip & stack", text: "Flip each patty. Add cheese to 4 of them. Immediately stack a plain patty on top of each cheese patty to form a double stack. The residual heat melts the cheese between the layers. Cook 1 more minute.", time: "1 min" },
+      { num: 5, title: "Build & serve", text: "Sauce on the bottom bun. Stack pickles, lettuce, tomato, onion. Add the double patty and top bun. Serve immediately — smashburgers are best eaten the moment they come off the griddle." },
+    ]
+  },
+
+  "korean beef bowls (bulgogi-style)": {
+    id: "korean-beef", section: "beef", servings: 4,
+    ingredients: [
+      { group: "Sauce", items: [
+        { amount: "3 Tbsp", name: "Soy sauce" },
+        { amount: "2 Tbsp", name: "Brown sugar" },
+        { amount: "1 Tbsp", name: "Sesame oil" },
+        { amount: "4 cloves", name: "Garlic, minced" },
+        { amount: "1 tsp", name: "Fresh ginger, grated" },
+        { amount: "½ tsp", name: "Red pepper flakes" },
+      ]},
+      { group: "Bowl", items: [
+        { amount: "1 Tbsp", name: "Neutral oil" },
+        { amount: "1 lb", name: "Ground beef" },
+        { amount: "2 heads", name: "Bok choy, roughly chopped" },
+        { amount: "3 cups", name: "Cooked white rice" },
+        { amount: "to garnish", name: "Sliced green onions, sesame seeds, fried egg" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Mix the sauce", text: "Whisk together all sauce ingredients until the sugar dissolves. Set aside — having it ready before you start cooking matters since the rest moves fast." },
+      { num: 2, title: "Brown the beef", text: "Heat oil in a large skillet over medium-high. Add beef and spread into a single layer. Let it sit undisturbed 2–3 minutes to develop a crust — don't stir it into a mush. Break apart, let it sit again, and repeat until well browned with crispy bits. Drain excess fat.", time: "7–8 min" },
+      { num: 3, title: "Caramelize", text: "Pour sauce over beef. Stir to coat and cook 2 minutes until the sauce reduces and caramelizes slightly against the hot pan.", time: "2 min" },
+      { num: 4, title: "Add bok choy & serve", text: "Push beef to the side. Add bok choy stalks first; after 30 seconds add the leaves. Toss everything together until the leaves are just wilted — about 1 more minute. Serve over rice with green onions, sesame seeds, and a fried egg if desired.", time: "2 min" },
+    ]
+  },
+
+  "easy ground beef tacos": {
+    id: "tacos", section: "beef", servings: 4,
+    ingredients: [
+      { group: "Taco Meat", items: [
+        { amount: "1½ lbs", name: "Ground beef, 80/20" },
+        { amount: "1", name: "Yellow onion, finely diced" },
+        { amount: "3 cloves", name: "Garlic, minced" },
+        { amount: "1 tsp", name: "Chili powder" },
+        { amount: "1 tsp", name: "Cumin" },
+        { amount: "½ tsp", name: "Smoked paprika" },
+        { amount: "½ tsp", name: "Dried oregano" },
+        { amount: "¼ tsp", name: "Cayenne" },
+        { amount: "¼ cup", name: "Tomato sauce or beef broth" },
+        { amount: "to taste", name: "Salt & pepper" },
+      ]},
+      { group: "To Serve", items: [
+        { amount: "8", name: "Corn tortillas (GF/DF) or flour" },
+        { amount: "to taste", name: "Salsa, guacamole, lime, cabbage" },
+        { amount: "to taste", name: "Sour cream, shredded cheese (omit for DF)" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Brown the beef", text: "Cook beef and onion in a skillet over medium-high, breaking up the meat as it cooks. The key is to let it sit between stirs so it browns rather than steams — 8 minutes total until the liquid has evaporated and the beef has some color. Drain excess fat.", time: "8 min" },
+      { num: 2, title: "Season & simmer", text: "Add garlic and all spices. Stir constantly for 1 minute — blooming spices in hot fat releases far more flavor than adding them with liquid. Add tomato sauce or broth and stir. Simmer 2–3 minutes until the sauce thickens and clings to the meat. Season assertively with salt.", time: "4 min" },
+      { num: 3, title: "Char the tortillas", text: "For corn tortillas, char directly over a gas burner 15–20 seconds per side or in a dry cast iron skillet until they have leopard spots. This step transforms a raw flour taste into something toasted and nutty.", time: "2 min" },
+      { num: 4, title: "Assemble", text: "Fill tortillas and top with your choice of accompaniments. A squeeze of fresh lime over everything before eating brightens all the other flavors." },
+    ]
+  },
+
+  // ── CHICKEN ───────────────────────────────────────────────────────────────
+
+  "mike's hot honey garlic roasted chicken thighs": {
+    id: "hot-honey-chicken", section: "chicken", servings: 4,
+    ingredients: [
+      { group: "Chicken", items: [
+        { amount: "4 lbs", name: "Bone-in skin-on chicken thighs" },
+        { amount: "1 tsp", name: "Smoked paprika" },
+        { amount: "1 tsp", name: "Garlic powder" },
+        { amount: "1 tsp", name: "Onion powder" },
+        { amount: "to taste", name: "Kosher salt & black pepper" },
+      ]},
+      { group: "Hot Honey Glaze", items: [
+        { amount: "3 Tbsp", name: "Mike's Hot Honey" },
+        { amount: "4 cloves", name: "Garlic, minced" },
+        { amount: "2 Tbsp", name: "Soy sauce (or tamari for GF)" },
+        { amount: "1 Tbsp", name: "Unsalted butter" },
+        { amount: "1 tsp", name: "Rice vinegar or apple cider vinegar" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Dry brine", text: "Pat thighs completely dry with paper towels — moisture is the enemy of crispy skin. Season on all sides with salt, pepper, paprika, garlic powder, and onion powder. Rest uncovered on a rack in the fridge for at least 30 minutes, or overnight for dramatically better skin.", time: "30 min – overnight" },
+      { num: 2, title: "Sear skin-side down", text: "Pull chicken from fridge 20–30 minutes before cooking. Heat a cast iron skillet over medium — not high, which burns before crisping. Add thighs skin-side down in a dry pan. Press gently and cook undisturbed 7–8 minutes until the skin is deep golden and releases cleanly. Flip and sear the flesh side 2 more minutes.", time: "9–10 min" },
+      { num: 3, title: "Roast", text: "Transfer skillet to a 425°F oven skin-side up. Roast 20–25 minutes until internal temperature at the thickest point reaches 190–195°F. Thighs benefit from higher temp than breast — the collagen breaks down and the meat becomes silky rather than dry.", time: "20–25 min" },
+      { num: 4, title: "Make the glaze", text: "Melt butter in a small saucepan over medium-low. Add garlic, cook 1–2 minutes until fragrant. Add honey, soy sauce, and vinegar. Simmer 4–5 minutes until slightly thickened and coating a spoon.", time: "6–8 min" },
+      { num: 5, title: "Glaze & finish", text: "With 5–7 minutes left in the oven, pull the skillet and brush glaze generously over the skin. Return to oven. Watch closely — honey caramelizes fast and can go from lacquered to burnt in under a minute. Rest 5–10 minutes before serving.", time: "5–10 min" },
+    ]
+  },
+
+  "spatchcock chicken with homemade herb sauce": {
+    id: "spatchcock", section: "chicken", servings: 4,
+    ingredients: [
+      { group: "Chicken & Rub", items: [
+        { amount: "1 whole (5 lbs)", name: "Chicken, spatchcocked" },
+        { amount: "1½ Tbsp", name: "Kosher salt" },
+        { amount: "1 Tbsp", name: "Brown sugar" },
+        { amount: "1 Tbsp", name: "Paprika" },
+        { amount: "1 Tbsp", name: "Garlic powder" },
+        { amount: "1 tsp", name: "Black pepper" },
+        { amount: "2 Tbsp", name: "Olive oil" },
+      ]},
+      { group: "Herb Sauce", items: [
+        { amount: "¾ cup", name: "Mayonnaise" },
+        { amount: "10 leaves", name: "Fresh basil" },
+        { amount: "⅓ cup", name: "Fresh cilantro, packed" },
+        { amount: "4", name: "Green onions, roughly chopped" },
+        { amount: "6 cloves", name: "Garlic" },
+        { amount: "2 Tbsp", name: "Fresh lemon juice" },
+        { amount: "to taste", name: "Salt & pepper" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Spatchcock the chicken", text: "Place chicken breast-side down. Using sturdy kitchen shears, cut along both sides of the backbone from tail to neck and remove it (save it for stock). Flip breast-side up and press firmly on the breastbone with both palms until you hear a crack and the bird lays completely flat. This opens the chicken so every part hits the grill simultaneously." },
+      { num: 2, title: "Dry brine & season", text: "Mix salt, brown sugar, paprika, garlic powder, and pepper. Pat chicken dry and rub with olive oil, then coat every surface with the spice rub — get under the skin too. For best results, refrigerate uncovered on a rack for at least 2 hours or overnight. The brine pulls moisture out, then it reabsorbs, seasoning the meat from within.", time: "2+ hours" },
+      { num: 3, title: "Make the herb sauce", text: "Blend or food-process the basil, cilantro, green onions, garlic, and lemon juice until finely chopped. Fold into the mayonnaise and season to taste. Refrigerate until serving — the flavors deepen as it sits." },
+      { num: 4, title: "Grill", text: "Heat grill to medium-high (350–400°F). Oil the grates. Place chicken skin-side down over direct heat. Grill 5 minutes until skin is crispy and charred. Reduce heat to low (250–300°F), flip, and continue grilling until the thickest part of the thigh reads 165°F.", time: "40–50 min" },
+      { num: 5, title: "Rest & serve", text: "Rest on a cutting board 10 minutes before carving. The rest allows juices to redistribute — cutting immediately loses a third of the moisture. Serve family-style with herb sauce alongside.", time: "10 min" },
+    ]
+  },
+
+  "marry me chicken meatballs": {
+    id: "marry-me-meatballs", section: "chicken", servings: 5,
+    ingredients: [
+      { group: "Meatballs", items: [
+        { amount: "2 lbs", name: "Ground chicken, chilled" },
+        { amount: "⅓ cup", name: "Almond flour or GF breadcrumbs" },
+        { amount: "⅓ cup", name: "Sun-dried tomatoes, finely chopped" },
+        { amount: "½ cup", name: "Fresh basil, chopped" },
+        { amount: "4 cloves", name: "Garlic, minced — half for balls, half for sauce" },
+        { amount: "1 tsp", name: "Onion powder" },
+        { amount: "½ tsp", name: "Dried oregano" },
+        { amount: "¼ tsp", name: "Red pepper flakes" },
+        { amount: "1 tsp", name: "Kosher salt" },
+      ]},
+      { group: "Marry Me Sauce", items: [
+        { amount: "1 Tbsp", name: "Olive oil" },
+        { amount: "3 cloves", name: "Garlic, minced" },
+        { amount: "⅓ cup", name: "Sun-dried tomatoes, chopped" },
+        { amount: "1 cup", name: "Chicken bone broth" },
+        { amount: "1 can (13.5oz)", name: "Full-fat coconut milk (or heavy cream)" },
+        { amount: "1 tsp", name: "Dried oregano" },
+        { amount: "¼ tsp", name: "Red pepper flakes" },
+        { amount: "2 handfuls", name: "Fresh spinach" },
+        { amount: "to taste", name: "Salt & pepper" },
+        { amount: "to serve", name: "Fresh basil" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Form & bake meatballs", text: "Preheat oven to 400°F. Line a large sheet pan with parchment. Combine all meatball ingredients in a bowl. Use cold ground chicken — it holds its shape far better than room-temperature. Mix gently with damp hands until just combined; overworking toughens the texture. Roll into 1½-inch balls and bake 18–20 minutes until lightly golden and cooked to 165°F.", time: "18–20 min" },
+      { num: 2, title: "Build the sauce base", text: "Heat olive oil in a large skillet over medium. Add garlic, cook 1–2 minutes until fragrant. Add sun-dried tomatoes and stir 1 minute — the oil in the tomatoes blooms with the garlic.", time: "3 min" },
+      { num: 3, title: "Simmer the sauce", text: "Add broth and coconut milk. Stir in oregano and red pepper flakes. Bring to a gentle simmer and cook 8–10 minutes, stirring occasionally, until the sauce reduces and thickens slightly.", time: "8–10 min" },
+      { num: 4, title: "Finish & serve", text: "Add spinach and stir until just wilted. Nestle baked meatballs into the sauce and simmer 3–5 minutes — this final step lets the flavors 'marry.' Taste and adjust salt. Scatter fresh basil over the top and serve over rice, pasta, or spaghetti squash.", time: "3–5 min" },
+    ]
+  },
+
+  "chicken piccata meatballs": {
+    id: "piccata-meatballs", section: "chicken", servings: 4,
+    ingredients: [
+      { group: "Meatballs", items: [
+        { amount: "2 lbs", name: "Ground chicken" },
+        { amount: "¾ cup", name: "Panko breadcrumbs (GF panko works)" },
+        { amount: "2", name: "Eggs" },
+        { amount: "4 cloves", name: "Garlic, minced" },
+        { amount: "4 Tbsp", name: "Fresh parsley, chopped" },
+        { amount: "2 tsp", name: "Lemon zest" },
+        { amount: "1 tsp", name: "Kosher salt" },
+        { amount: "to taste", name: "Black pepper" },
+      ]},
+      { group: "Piccata Sauce", items: [
+        { amount: "4 Tbsp", name: "Olive oil" },
+        { amount: "4 cloves", name: "Garlic" },
+        { amount: "2 cups", name: "Chicken broth" },
+        { amount: "¼ cup", name: "Fresh lemon juice — about 4 lemons" },
+        { amount: "4 Tbsp", name: "Capers, drained" },
+        { amount: "2 tsp", name: "Dijon mustard" },
+        { amount: "4 tsp", name: "Cornstarch mixed with 2 Tbsp cold water" },
+        { amount: "2 handfuls", name: "Spinach (optional)" },
+      ]},
+      { group: "To Serve", items: [
+        { amount: "1 lb", name: "Angel hair pasta (or spaghetti squash for GF)" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Bake the meatballs", text: "Preheat oven to 400°F. Mix all meatball ingredients until just combined. Form into balls — about 2 Tbsp each — and arrange on a parchment-lined baking sheet. Bake 15–18 minutes until golden and cooked to 165°F internal. While they bake, start your sauce.", time: "15–18 min" },
+      { num: 2, title: "Cook pasta", text: "Bring a large pot of heavily salted water to boil. Cook pasta per package — angel hair cooks in just 3–4 minutes. Reserve ¼ cup pasta water before draining.", time: "10 min" },
+      { num: 3, title: "Build the piccata sauce", text: "Heat olive oil in a large skillet over medium. Add garlic and cook 30 seconds. Add broth, lemon juice, capers, and Dijon. Bring to a simmer and cook 3–5 minutes. The capers are doing significant seasoning work here — taste before adding any salt.", time: "5–7 min" },
+      { num: 4, title: "Thicken & finish", text: "Stir the cornstarch slurry slowly into the simmering sauce. Cook 1–2 minutes until the sauce is glossy and coats a spoon. Add spinach if using and stir until wilted." },
+      { num: 5, title: "Serve", text: "Toss drained pasta in the sauce. Arrange meatballs on top and spoon extra sauce over. A splash of reserved pasta water loosens the sauce if it's too thick." },
+    ]
+  },
+
+  "turmeric ginger lemon chicken stew": {
+    id: "chicken-stew", section: "chicken", servings: 6,
+    ingredients: [
+      { group: "Garlic Oil (Optional)", items: [
+        { amount: "1 cup", name: "Olive oil, for infusing" },
+        { amount: "5 cloves", name: "Garlic, smashed — removed after infusing" },
+      ]},
+      { group: "Stew", items: [
+        { amount: "4 lbs", name: "Boneless skinless chicken thighs" },
+        { amount: "2 Tbsp", name: "Garlic-infused olive oil" },
+        { amount: "2 Tbsp", name: "Fresh ginger, grated" },
+        { amount: "2 tsp", name: "Ground turmeric" },
+        { amount: "1½ tsp", name: "Kosher salt" },
+        { amount: "1½ cups", name: "Jasmine or basmati rice" },
+        { amount: "6 cups", name: "Chicken bone broth" },
+        { amount: "3", name: "Carrots, sliced" },
+        { amount: "2", name: "Bay leaves" },
+        { amount: "1 tsp", name: "Dijon mustard" },
+        { amount: "2 Tbsp", name: "Fresh lemon juice" },
+        { amount: "1 Tbsp", name: "Ghee" },
+        { amount: "to garnish", name: "Fresh parsley or cilantro" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Infuse the oil (optional)", text: "Warm olive oil with smashed garlic over the lowest heat for 10–15 minutes. The oil should barely bubble — you're infusing, not frying. Remove garlic and let oil cool. This step adds a background sweetness that raw garlic can't match.", time: "10–15 min" },
+      { num: 2, title: "Sear the chicken", text: "Heat 2 Tbsp infused oil in a Dutch oven over medium-high. Sear thighs 3–4 minutes per side until golden. You're not cooking them through — just building color and flavor. Remove and set aside.", time: "8 min" },
+      { num: 3, title: "Bloom the spices", text: "Reduce heat to medium. Add ginger and turmeric directly to the oil. Stir constantly for 60–90 seconds until the mixture smells fragrant and the turmeric deepens in color. Blooming spices in fat releases fat-soluble flavor compounds.", time: "1–2 min" },
+      { num: 4, title: "Build & simmer", text: "Add rice, carrots, bay leaves, and Dijon. Stir to coat in the spiced oil. Pour in broth, season with salt, and bring to a gentle boil. Return chicken to the pot, cover, and reduce to the lowest simmer.", time: "25–30 min" },
+      { num: 5, title: "Shred & finish", text: "Remove bay leaves. Pull chicken thighs out, shred with two forks, and return to pot. Stir in lemon juice and ghee. The ghee adds richness and a gentle gloss. Taste and adjust salt and acidity — this dish needs brightness, so don't hold back on the lemon. Garnish and serve." },
+    ]
+  },
+
+  "grilled chicken marinade": {
+    id: "grilled-chicken-marinade", section: "chicken", servings: 4,
+    ingredients: [
+      { group: "", items: [
+        { amount: "2 lbs", name: "Chicken breasts, thighs, or tenders" },
+        { amount: "⅓ cup", name: "Extra virgin olive oil" },
+        { amount: "3 Tbsp", name: "Fresh lemon juice — about 1 lemon" },
+        { amount: "3 Tbsp", name: "Soy sauce (or tamari for GF)" },
+        { amount: "2 Tbsp", name: "Balsamic vinegar" },
+        { amount: "¼ cup", name: "Brown sugar or honey" },
+        { amount: "1 Tbsp", name: "Worcestershire sauce" },
+        { amount: "3 cloves", name: "Garlic, minced" },
+        { amount: "1 tsp", name: "Black pepper" },
+        { amount: "to taste", name: "Kosher salt" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Make the marinade", text: "Whisk all marinade ingredients together until the brown sugar fully dissolves. The formula here is balanced: fat for moisture, acid to tenderize, salt for depth, sugar for caramelization." },
+      { num: 2, title: "Marinate", text: "Place chicken in a zip-lock bag. Use a fork to poke small holes all over — this helps the marinade penetrate past the surface. Pour marinade over, seal, and refrigerate. Minimum 30 minutes; overnight is best for maximum flavor.", time: "30 min – overnight" },
+      { num: 3, title: "Grill", text: "Remove chicken from marinade and let excess drip off — too much marinade on the grill causes flare-ups. Grill over medium-high, 5–6 minutes per side for breasts, 6–7 minutes per side for thighs, until internal temperature reaches 165°F.", time: "10–14 min" },
+      { num: 4, title: "Rest & serve", text: "Transfer to a cutting board and rest 5 minutes before slicing. Resting lets internal juices settle back into the muscle fibers instead of running out when you cut.", time: "5 min" },
+    ]
+  },
+
+  "chicken marinade": {
+    id: "chicken-marinade", section: "chicken", servings: 4,
+    ingredients: [
+      { group: "", items: [
+        { amount: "2 lbs", name: "Boneless skinless chicken thighs — preferred over breasts" },
+        { amount: "¼ cup", name: "Olive oil" },
+        { amount: "3 Tbsp", name: "Soy sauce (or tamari for GF)" },
+        { amount: "2 Tbsp", name: "Balsamic vinegar" },
+        { amount: "2 Tbsp", name: "Fresh lemon juice" },
+        { amount: "1 Tbsp", name: "Honey or brown sugar" },
+        { amount: "1 Tbsp", name: "Dijon mustard" },
+        { amount: "3 cloves", name: "Garlic, minced" },
+        { amount: "1 tsp", name: "Dried oregano or Italian seasoning" },
+        { amount: "½ tsp", name: "Smoked paprika" },
+        { amount: "to taste", name: "Kosher salt & black pepper" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Marinate", text: "Whisk marinade ingredients together. Coat chicken thighs thoroughly. Marinate in the fridge at least 30 minutes — up to 24 hours. Thighs can handle a longer marinade than breasts without the acid breaking down the texture.", time: "30 min – 24 hours" },
+      { num: 2, title: "Air fryer method", text: "Preheat air fryer to 380°F. Remove chicken, letting excess marinade drip off. Cook in a single layer 18–22 minutes, flipping halfway, until internal temp hits 165°F. The circulating air crisps the edges in a way the oven can't match.", time: "18–22 min" },
+      { num: 3, title: "Oven or grill alternative", text: "Oven: 425°F for 20–25 minutes on a wire rack over a sheet pan. Grill: medium-high, 6–7 minutes per side." },
+      { num: 4, title: "Rest & serve", text: "Rest 5 minutes before slicing. The marinade caramelizes beautifully on thighs, giving them a lacquered finish.", time: "5 min" },
+    ]
+  },
+
+  "garlic chicken thighs": {
+    id: "garlic-thighs", section: "chicken", servings: 4,
+    ingredients: [
+      { group: "", items: [
+        { amount: "2 lbs", name: "Bone-in skin-on chicken thighs" },
+        { amount: "8 cloves", name: "Garlic, smashed and peeled" },
+        { amount: "2 Tbsp", name: "Unsalted butter (or olive oil for DF)" },
+        { amount: "1 Tbsp", name: "Olive oil" },
+        { amount: "½ cup", name: "Chicken broth" },
+        { amount: "2 Tbsp", name: "Fresh thyme or rosemary leaves" },
+        { amount: "1 Tbsp", name: "Fresh lemon juice" },
+        { amount: "to taste", name: "Kosher salt & black pepper" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Sear skin-side down", text: "Pat chicken completely dry — this is non-negotiable for crispy skin. Season all sides generously. Heat olive oil in a large skillet over medium (not high — medium gives even browning without burning). Place thighs skin-side down and press gently. Cook undisturbed 7–8 minutes until the skin is deep golden and releases cleanly without sticking.", time: "7–8 min" },
+      { num: 2, title: "Flip & add garlic", text: "Flip thighs. Add butter and garlic cloves to the pan. Tilt the pan and spoon the foaming butter over the thighs continuously — this is basting, and it accelerates browning on the flesh side. Cook 2 minutes, watching the garlic closely so it turns golden but not dark brown.", time: "2 min" },
+      { num: 3, title: "Finish in pan", text: "Add broth and herbs. Reduce heat to medium-low, cover, and cook 5–7 minutes until the thighs reach 165°F. The steam from the broth finishes the meat while keeping it moist.", time: "5–7 min" },
+      { num: 4, title: "Rest & serve", text: "Squeeze lemon over the chicken and let rest 5 minutes. Spoon the garlic and all the pan juices over the top to serve.", time: "5 min" },
+    ]
+  },
+
+  // ── SEAFOOD ───────────────────────────────────────────────────────────────
+
+  "air-fried chilean sea bass": {
+    id: "sea-bass", section: "seafood", servings: 2,
+    ingredients: [
+      { group: "Fish", items: [
+        { amount: "1–1½ lbs", name: "Chilean sea bass, cut into 2 portions" },
+        { amount: "to taste", name: "Kosher salt & black pepper" },
+        { amount: "cooking spray", name: "For the basket" },
+      ]},
+      { group: "Honey Garlic Glaze", items: [
+        { amount: "2 Tbsp", name: "Honey — or Mike's Hot Honey for heat" },
+        { amount: "1 Tbsp", name: "Soy sauce (or tamari for GF)" },
+        { amount: "2 cloves", name: "Garlic, finely grated" },
+        { amount: "¼ tsp", name: "Red pepper flakes (optional)" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Prep the fish", text: "Preheat air fryer to 375°F. Spray the basket lightly. Pat sea bass fillets completely dry with paper towels — this single step determines whether you get caramelization or steaming. Season both sides generously with salt and pepper.", time: "5 min" },
+      { num: 2, title: "Air fry — first pass", text: "Place fillets skin-side down in the basket without overlapping. Air fry at 375°F for 10 minutes. Don't open the basket.", time: "10 min" },
+      { num: 3, title: "Make the glaze", text: "While the fish cooks, stir honey, soy sauce, garlic, and red pepper flakes together until smooth. Have a brush ready." },
+      { num: 4, title: "Glaze & finish", text: "After 10 minutes, brush glaze generously over the fish. Increase temperature to 400°F and cook 2 more minutes until the glaze caramelizes and the fish flakes cleanly when pressed with a fork. Honey burns fast at high heat — watch closely.", time: "2 min" },
+      { num: 5, title: "Rest & serve", text: "Rest 2 minutes before plating. Sea bass is rich and buttery — it pairs best with something acidic alongside, like cucumber salad or a squeeze of fresh lemon.", time: "2 min" },
+    ]
+  },
+
+  "blackened shrimp": {
+    id: "blackened-shrimp", section: "seafood", servings: 4,
+    ingredients: [
+      { group: "Blackening Spice Blend", items: [
+        { amount: "1 tsp", name: "Smoked paprika" },
+        { amount: "½ tsp", name: "Garlic powder" },
+        { amount: "½ tsp", name: "Onion powder" },
+        { amount: "½ tsp", name: "Dried oregano" },
+        { amount: "½ tsp", name: "Dried thyme" },
+        { amount: "¼ tsp", name: "Cayenne — increase for more heat" },
+        { amount: "¼ tsp", name: "Black pepper" },
+        { amount: "½ tsp", name: "Kosher salt" },
+      ]},
+      { group: "Shrimp", items: [
+        { amount: "1½ lbs", name: "Large shrimp (16/20 count), peeled & deveined" },
+        { amount: "1 Tbsp", name: "Olive oil" },
+        { amount: "2 Tbsp", name: "Unsalted butter (or olive oil for DF)" },
+        { amount: "4 cloves", name: "Garlic, minced" },
+        { amount: "1 Tbsp", name: "Fresh lemon juice" },
+        { amount: "to garnish", name: "Fresh parsley & lemon wedges" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Prep the shrimp", text: "Mix together all spice blend ingredients in a small bowl. Pat shrimp completely dry with paper towels — wet shrimp steam rather than blacken. Toss in the spice blend until evenly coated." },
+      { num: 2, title: "Superheat the pan", text: "Heat a cast iron skillet over high heat for 2–3 minutes until it is extremely hot. This is what creates the blackened crust — not burning, but a Maillard reaction at very high temp. Add olive oil and swirl quickly.", time: "2–3 min" },
+      { num: 3, title: "Cook the shrimp", text: "Add shrimp in a single layer — do not crowd the pan or they'll steam. Cook 1½–2 minutes per side until the spice crust is deeply charred and the shrimp is just opaque throughout. Shrimp cook in under 4 minutes total; pull them the moment they're done.", time: "3–4 min" },
+      { num: 4, title: "Finish", text: "Reduce heat to medium. Add butter and garlic. Toss shrimp in the garlic butter for 30 seconds. Squeeze lemon juice over the top to cut through the richness. Plate immediately — shrimp don't hold well.", time: "1 min" },
+    ]
+  },
+
+  "old bay shrimp boil": {
+    id: "shrimp-boil", section: "seafood", servings: 4,
+    ingredients: [
+      { group: "The Boil", items: [
+        { amount: "1 lb", name: "Baby potatoes, halved" },
+        { amount: "3 ears", name: "Corn, cut into thirds" },
+        { amount: "12 oz", name: "Smoked andouille or kielbasa, sliced" },
+        { amount: "1½ lbs", name: "Large shrimp, shell-on or peeled & deveined" },
+        { amount: "⅓ cup", name: "Old Bay seasoning" },
+        { amount: "1", name: "Onion, quartered" },
+        { amount: "4 cloves", name: "Garlic, smashed" },
+        { amount: "2", name: "Lemons, halved and squeezed in" },
+        { amount: "to taste", name: "Salt" },
+      ]},
+      { group: "Finishing Butter", items: [
+        { amount: "4 Tbsp", name: "Unsalted butter, melted (or DF substitute)" },
+        { amount: "1 Tbsp", name: "Old Bay" },
+        { amount: "1 Tbsp", name: "Fresh parsley, chopped" },
+        { amount: "1", name: "Lemon, juiced" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Build the broth", text: "Fill a large stockpot (at least 12 quarts) with 4–5 quarts of water. Squeeze lemons in and add the halved shells. Add onion, garlic, Old Bay, and salt. Bring to a rolling boil over high heat.", time: "10 min" },
+      { num: 2, title: "Cook potatoes", text: "Add potatoes to the boiling broth. Cook 10–12 minutes until nearly tender — they should still have slight resistance since they'll carry over-cook later.", time: "10–12 min" },
+      { num: 3, title: "Add corn & sausage", text: "Add corn and sausage and cook 5 more minutes.", time: "5 min" },
+      { num: 4, title: "Cook shrimp — don't overcook", text: "Add shrimp last. Cook exactly 2–3 minutes until pink and just curled. Drain everything immediately — shrimp continue cooking from residual heat and turn rubbery if left in hot liquid even a minute too long.", time: "2–3 min" },
+      { num: 5, title: "Toss & serve", text: "In a large bowl, toss everything with melted butter, Old Bay, parsley, and lemon juice. Serve spread on a table lined with parchment or newspaper, with lemon wedges and crusty bread." },
+    ]
+  },
+
+  // ── SOUPS & STEWS ─────────────────────────────────────────────────────────
+
+  "grandma's meat sauce": {
+    id: "meat-sauce", section: "beef", servings: 8,
+    ingredients: [
+      { group: "Meats", items: [
+        { amount: "4 lbs", name: "Ground sirloin (or ground chicken)" },
+        { amount: "1½ lbs", name: "Mild or spicy Italian sausage" },
+      ]},
+      { group: "Aromatics", items: [
+        { amount: "1 medium", name: "Yellow onion, diced" },
+        { amount: "6 cloves", name: "Garlic, chopped" },
+      ]},
+      { group: "Tomatoes", items: [
+        { amount: "2 × 28oz", name: "Crushed tomatoes" },
+        { amount: "3 × 28oz", name: "Tomato puree" },
+        { amount: "1 × 12oz", name: "Tomato paste" },
+      ]},
+      { group: "Seasoning", items: [
+        { amount: "2 Tbsp", name: "Dried basil" },
+        { amount: "1 Tbsp", name: "Dried oregano" },
+        { amount: "1 tsp", name: "Red pepper flakes" },
+        { amount: "to taste", name: "Salt & pepper" },
+      ]},
+      { group: "Secret", items: [
+        { amount: "2 oz", name: "Dark or semi-sweet chocolate" },
+        { amount: "few dashes", name: "Tabasco" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Brown the meats", text: "Brown sirloin and sausage in olive oil in a large stock pot over medium-high, breaking into small pieces. Don't stir constantly — let it sit and brown. Drain excess fat with a paper towel pressed against the pan, leaving just a thin coating.", time: "10–12 min" },
+      { num: 2, title: "Sauté aromatics", text: "In a separate pan, sauté onion 4–5 minutes until softened. Add garlic and cook 1 minute more. Add to the meat pot." },
+      { num: 3, title: "Build the sauce", text: "Add all three tomato products, basil, oregano, red pepper flakes, Tabasco, and chocolate. Stir to combine. The chocolate isn't detectable as chocolate — it rounds out acidity and adds depth that's hard to explain." },
+      { num: 4, title: "Long simmer", text: "Bring to a boil, then reduce to the lowest possible simmer. Partially cover and cook at least 2 hours, stirring every 20–30 minutes. The long simmer is what transforms this from a quick tomato sauce into something that tastes like it's been cooking all day — because it has.", time: "2+ hours" },
+      { num: 5, title: "Season & serve", text: "Taste and adjust seasoning. The sodium in your tomato products varies by brand, so always season at the end. Serve over pasta or GF noodles. Freezes beautifully for up to 3 months." },
+    ]
+  },
+
+  "high-protein minestrone": {
+    id: "minestrone", section: "chicken", servings: 6,
+    ingredients: [
+      { group: "Protein", items: [
+        { amount: "2 lbs", name: "Italian sausage, casings removed" },
+        { amount: "1½ lbs", name: "Boneless skinless chicken breasts" },
+      ]},
+      { group: "Base", items: [
+        { amount: "2 Tbsp", name: "Olive oil" },
+        { amount: "1 large", name: "Yellow onion, diced" },
+        { amount: "3", name: "Carrots, diced" },
+        { amount: "3 ribs", name: "Celery, diced" },
+        { amount: "4 cloves", name: "Garlic, minced" },
+        { amount: "2 Tbsp", name: "Tomato paste" },
+      ]},
+      { group: "Liquid & Vegetables", items: [
+        { amount: "10–12 cups", name: "Low-sodium chicken stock" },
+        { amount: "1 × 28oz", name: "Crushed tomatoes" },
+        { amount: "2 medium", name: "Zucchini, diced" },
+        { amount: "1½ cups", name: "Green beans, chopped" },
+        { amount: "3 cups", name: "Spinach or kale, rough chopped" },
+        { amount: "2 × 15oz", name: "Cannellini beans, drained and rinsed" },
+        { amount: "1½ cups", name: "Ditalini or small pasta (optional)" },
+      ]},
+      { group: "Seasoning & Finish", items: [
+        { amount: "2 tsp", name: "Dried oregano" },
+        { amount: "½–1 tsp", name: "Red pepper flakes" },
+        { amount: "1 rind", name: "Parmesan rind (omit for DF)" },
+        { amount: "1–2 Tbsp", name: "Fresh lemon juice" },
+        { amount: "to taste", name: "Kosher salt & black pepper" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Brown the sausage", text: "Heat olive oil in a large Dutch oven over medium-high. Add sausage and break into pieces. Cook until deeply browned — don't just cook it through; the browning is flavor. Remove with a slotted spoon and set aside. Leave the fat in the pan.", time: "8–10 min" },
+      { num: 2, title: "Build the base", text: "Add onion, carrot, and celery. Cook 5–7 minutes until softened. Add garlic and tomato paste. Stir constantly 2 minutes until the paste caramelizes to a darker, brick-red color.", time: "8 min" },
+      { num: 3, title: "Add liquid & poach chicken", text: "Pour in stock and crushed tomatoes. Add oregano, red pepper flakes, and parmesan rind if using. Bring to a simmer. Add whole chicken breasts and poach gently until cooked through, 12–15 minutes. Remove and shred with two forks.", time: "15 min" },
+      { num: 4, title: "Add proteins & vegetables", text: "Return sausage and shredded chicken to pot. Add cannellini beans, zucchini, and green beans. Simmer 10–12 minutes until vegetables are tender but not mushy.", time: "10–12 min" },
+      { num: 5, title: "Finish", text: "If using pasta, add in the last 8–10 minutes of simmering. Stir in spinach until just wilted. Remove parmesan rind. Add lemon juice to brighten. Season to taste. This soup tastes even better the next day." },
+    ]
+  },
+
+  "gumbo with chicken & andouille sausage": {
+    id: "gumbo", section: "chicken", servings: 6,
+    ingredients: [
+      { group: "Proteins", items: [
+        { amount: "2 lbs", name: "Boneless skinless chicken thighs" },
+        { amount: "1 lb", name: "Andouille sausage, sliced" },
+        { amount: "2 Tbsp", name: "Olive oil, for searing" },
+      ]},
+      { group: "The Holy Trinity", items: [
+        { amount: "2 cups", name: "Yellow onion, diced" },
+        { amount: "2 cups", name: "Green bell pepper, diced" },
+        { amount: "2 cups", name: "Celery, diced" },
+        { amount: "6 cloves", name: "Garlic, minced" },
+        { amount: "1 cup", name: "Tomatoes, diced" },
+        { amount: "1 cup", name: "Okra, sliced (optional)" },
+      ]},
+      { group: "Roux Substitute", items: [
+        { amount: "3 Tbsp", name: "Olive oil" },
+        { amount: "1½ Tbsp", name: "Coconut flour or almond flour" },
+      ]},
+      { group: "Liquid & Seasoning", items: [
+        { amount: "10 cups", name: "Low-sodium chicken broth" },
+        { amount: "2 Tbsp", name: "Smoked paprika" },
+        { amount: "1 Tbsp", name: "Cayenne — adjust to heat preference" },
+        { amount: "1 Tbsp", name: "Black pepper" },
+        { amount: "1 Tbsp", name: "Each: dried oregano & dried thyme" },
+        { amount: "2 Tbsp", name: "Worcestershire sauce (GF brand)" },
+        { amount: "2", name: "Bay leaves" },
+        { amount: "to taste", name: "Salt" },
+        { amount: "1 tsp", name: "Gumbo filé powder, to finish (optional)" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Sear the proteins", text: "Heat oil in a large Dutch oven over medium-high. Sear chicken thighs 3–4 minutes per side until browned. Remove. Sear sausage slices 2 minutes per side. Remove. The goal is a deep fond — those browned bits on the bottom are your flavor base.", time: "10–12 min" },
+      { num: 2, title: "Make the roux substitute", text: "Reduce heat to medium. Add 3 Tbsp olive oil and the flour. Stir constantly until the mixture is golden brown and smells nutty — this is a quick roux substitute that adds body and color without the 45-minute traditional version.", time: "3–5 min" },
+      { num: 3, title: "Cook the trinity", text: "Add onion, celery, and bell pepper to the roux. Sauté until softened, 6–7 minutes. Add garlic, tomatoes, and okra. Stir and cook 2 more minutes.", time: "8 min" },
+      { num: 4, title: "Build & simmer", text: "Return chicken and sausage to the pot. Add all seasonings, Worcestershire, bay leaves, and broth. Stir to combine. Bring to a boil, then reduce to a steady simmer. Cover and cook.", time: "45 min" },
+      { num: 5, title: "Shred & finish", text: "Remove chicken thighs and shred with two forks. Return to pot. Add filé powder if using — it thickens the gumbo and adds an earthy note unique to the dish. Taste and adjust seasoning. Serve over rice." },
+    ]
+  },
+
+  "lasagna soup": {
+    id: "lasagna-soup", section: "beef", servings: 6,
+    ingredients: [
+      { group: "Meat", items: [
+        { amount: "½ lb", name: "Lean ground beef" },
+        { amount: "½ lb", name: "Italian sausage, casings removed" },
+        { amount: "1 Tbsp", name: "Olive oil" },
+      ]},
+      { group: "Base", items: [
+        { amount: "1", name: "Yellow onion, diced" },
+        { amount: "3 cloves", name: "Garlic, minced" },
+        { amount: "2 Tbsp", name: "Tomato paste" },
+        { amount: "¼ tsp", name: "Red pepper flakes" },
+        { amount: "½ tsp", name: "Dried oregano" },
+        { amount: "1 tsp", name: "Dried basil" },
+      ]},
+      { group: "Liquid", items: [
+        { amount: "24 oz", name: "Good marinara sauce" },
+        { amount: "7 cups", name: "Low-sodium chicken or vegetable broth" },
+      ]},
+      { group: "Add-ins", items: [
+        { amount: "9", name: "Lasagna noodles, broken into rough pieces" },
+        { amount: "2 cups", name: "Fresh spinach" },
+        { amount: "to taste", name: "Salt & pepper" },
+      ]},
+      { group: "Cheese Topping", items: [
+        { amount: "10 oz", name: "Ricotta" },
+        { amount: "1 cup", name: "Mozzarella, shredded" },
+        { amount: "½ cup", name: "Parmesan, freshly grated" },
+        { amount: "2 Tbsp", name: "Fresh parsley, chopped" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Brown the meat", text: "Heat olive oil in a large Dutch oven over medium-high. Add beef and sausage. Cook, breaking apart, until well browned and any liquid has evaporated — 8–10 minutes. Drain excess fat, leaving just a thin coating.", time: "8–10 min" },
+      { num: 2, title: "Build the base", text: "Add onion and cook 4–5 minutes until softened. Add garlic, tomato paste, red pepper flakes, oregano, and basil. Stir constantly for 1–2 minutes. The tomato paste caramelizes against the hot pan, losing its raw edge and picking up sweetness.", time: "7 min" },
+      { num: 3, title: "Simmer", text: "Add marinara and broth. Stir to combine. Bring to a boil.", time: "5 min" },
+      { num: 4, title: "Cook the noodles in the soup", text: "Add broken lasagna noodles directly to the simmering soup. Cook 10–12 minutes, stirring occasionally. The noodles absorb some broth and release starch, which thickens the soup slightly.", time: "10–12 min" },
+      { num: 5, title: "Make the cheese topping", text: "Stir together ricotta, mozzarella, parmesan, and parsley in a small bowl. This replaces the layered cheese in traditional lasagna." },
+      { num: 6, title: "Finish & serve", text: "Stir spinach into the hot soup until just wilted. Season to taste. Ladle into bowls and drop a generous scoop of cheese mixture into each bowl. Let it melt slightly before eating. Serve with crusty bread." },
+    ]
+  },
+
+  // ── SIDES ─────────────────────────────────────────────────────────────────
+
+  "coconut jasmine rice": {
+    id: "coconut-rice", section: "sides", servings: 4,
+    ingredients: [
+      { group: "", items: [
+        { amount: "1½ cups", name: "Jasmine rice" },
+        { amount: "1 can (13.5oz)", name: "Full-fat coconut milk" },
+        { amount: "¾ cup", name: "Water or low-sodium chicken stock" },
+        { amount: "½ tsp", name: "Kosher salt" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Rinse the rice — once", text: "Rinse jasmine rice under cold water until the water runs mostly clear. A single rinse removes excess surface starch without stripping the starch that gives the finished rice its characteristic slightly sticky texture." },
+      { num: 2, title: "Combine & boil", text: "Add rice, coconut milk, water or stock, and salt to a medium saucepan. Give a single stir to combine. Bring to a full boil over medium-high heat — watch it closely as coconut milk foams and can boil over quickly.", time: "4–5 min" },
+      { num: 3, title: "Simmer with the lid on", text: "The moment it boils, reduce to the absolute lowest heat. Cover tightly and cook 15 minutes. Do not lift the lid — the steam is what finishes the rice.", time: "15 min" },
+      { num: 4, title: "Steam off heat", text: "Remove from heat. Leave covered and completely undisturbed for 10 minutes. This final steaming step finishes the centers of the grains without making them mushy.", time: "10 min" },
+      { num: 5, title: "Fluff & serve", text: "Fluff with a fork using light strokes from the bottom up. Serve immediately — coconut rice firms up as it cools." },
+    ]
+  },
+
+  "simple mashed potato": {
+    id: "mashed-potato", section: "sides", servings: 4,
+    ingredients: [
+      { group: "", items: [
+        { amount: "2½ lbs", name: "Russet or Yukon Gold potatoes" },
+        { amount: "6 Tbsp", name: "Unsalted butter, at room temperature" },
+        { amount: "¾ cup", name: "Whole milk or half-and-half, warmed" },
+        { amount: "¼ cup", name: "Sour cream (optional — adds tang and creaminess)" },
+        { amount: "1½ tsp", name: "Kosher salt, plus more to taste" },
+        { amount: "¼ tsp", name: "White or black pepper" },
+        { amount: "to garnish", name: "Fresh chives or parsley (optional)" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Peel, cut & boil", text: "Peel potatoes and cut into uniform ¾-inch pieces — consistent sizing ensures even cooking. Place in a pot of cold salted water (cold water heats with the potato for more even cooking than dropping pieces into boiling water). Bring to a boil, then reduce to a steady simmer. Cook 15–20 minutes until a fork slides in with zero resistance.", time: "20 min" },
+      { num: 2, title: "Drain & dry", text: "Drain completely. Return the potatoes to the warm pot over low heat for 1–2 minutes, shaking gently, to evaporate excess moisture. Dry potatoes make fluffier mash — wet potatoes make gluey mash.", time: "2 min" },
+      { num: 3, title: "Mash with butter first", text: "Remove from heat. Mash with a potato masher until no lumps remain. Add butter and mash until fully incorporated. Adding butter before liquid coats the starch granules, which produces a smoother, richer result." },
+      { num: 4, title: "Add warm dairy", text: "Add warmed milk and sour cream if using. Cold dairy shocks the starch and can make mashed potatoes gluey. Stir with a spatula — not a mixer — to combine. Season assertively with salt and pepper. Keep tasting." },
+      { num: 5, title: "Serve immediately", text: "Transfer to a serving dish. Press a well in the center for extra butter. Garnish with chives or parsley. Mashed potatoes are best eaten immediately after making." },
+    ]
+  },
+
+  "mushroom rice": {
+    id: "mushroom-rice", section: "sides", servings: 4,
+    ingredients: [
+      { group: "", items: [
+        { amount: "1½ cups", name: "Long-grain white rice" },
+        { amount: "1 lb", name: "Cremini or baby bella mushrooms, sliced" },
+        { amount: "1", name: "Yellow onion, finely diced" },
+        { amount: "4 cloves", name: "Garlic, minced" },
+        { amount: "3 Tbsp", name: "Unsalted butter (or olive oil for DF/vegan)" },
+        { amount: "2 cups", name: "Chicken or vegetable broth" },
+        { amount: "1 tsp", name: "Worcestershire sauce (omit for vegan)" },
+        { amount: "½ tsp", name: "Dried thyme" },
+        { amount: "to taste", name: "Kosher salt & black pepper" },
+        { amount: "2 Tbsp", name: "Fresh parsley, chopped" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Deeply brown the mushrooms", text: "Melt butter in a wide saucepan over medium-high. Add mushrooms in a single layer — crowding traps moisture and causes steaming instead of browning. Cook without stirring for 3–4 minutes until deeply golden on the bottom. Toss and brown the other side another 3 minutes. Remove to a plate. This step alone determines whether your mushroom rice is memorable or ordinary.", time: "6–8 min" },
+      { num: 2, title: "Sauté aromatics", text: "In the same pan, add onion and cook 4 minutes until translucent. Add garlic and thyme, cook 1 minute more.", time: "5 min" },
+      { num: 3, title: "Toast the rice", text: "Add dry rice to the pan. Stir to coat in the butter and cook 1–2 minutes until the grains look slightly translucent at the edges. Toasting the rice creates a nutty flavor and helps keep the grains separate.", time: "2 min" },
+      { num: 4, title: "Cook", text: "Add broth and Worcestershire. Stir once to combine and season lightly with salt. Bring to a boil, then immediately reduce to the lowest heat. Cover tightly and cook 17–18 minutes. Do not lift the lid.", time: "17–18 min" },
+      { num: 5, title: "Rest & finish", text: "Remove from heat. Leave covered 5 minutes. Fluff with a fork. Fold in the reserved browned mushrooms. Season to taste — mushrooms need more salt than you expect. Garnish with parsley.", time: "5 min" },
+    ]
+  },
+
+  "sautéed green beans with garlic": {
+    id: "green-beans", section: "sides", servings: 4,
+    ingredients: [
+      { group: "", items: [
+        { amount: "1 lb", name: "Green beans, trimmed" },
+        { amount: "2 Tbsp", name: "Olive oil or unsalted butter" },
+        { amount: "3 cloves", name: "Garlic, thinly sliced" },
+        { amount: "1 tsp", name: "Lemon zest" },
+        { amount: "1 Tbsp", name: "Fresh lemon juice" },
+        { amount: "pinch", name: "Red pepper flakes (optional)" },
+        { amount: "to taste", name: "Kosher salt & black pepper" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Optional blanch", text: "For the most vibrant color and best texture, blanch beans in heavily salted boiling water for 2 minutes, then immediately shock in ice water. This stops the cooking and locks in the green color. Skip if you're short on time.", time: "4 min" },
+      { num: 2, title: "High-heat sauté", text: "Heat oil or butter in a large skillet over medium-high. If using blanched beans, pat them dry first — water in a hot pan causes splattering and steaming. Add beans in a single layer and let them sit undisturbed 2–3 minutes until they blister and char slightly. Toss and cook 2 more minutes.", time: "4–5 min" },
+      { num: 3, title: "Add garlic", text: "Push beans to the edges. Add garlic and red pepper flakes to the center. Cook 30–60 seconds until golden and fragrant. Garlic burns fast in a hot pan — once it's golden, immediately toss everything together.", time: "1 min" },
+      { num: 4, title: "Finish & serve", text: "Remove from heat. Add lemon juice and zest. Toss to coat. Season generously — green beans need assertive seasoning. Serve immediately while hot and still slightly crisp." },
+    ]
+  },
+
+  "balsamic vinaigrette dressing": {
+    id: "balsamic-dressing", section: "sides", servings: 6,
+    ingredients: [
+      { group: "", items: [
+        { amount: "3 Tbsp", name: "Good balsamic vinegar" },
+        { amount: "1 Tbsp", name: "Dijon mustard" },
+        { amount: "1 clove", name: "Garlic, finely grated or pressed" },
+        { amount: "1 tsp", name: "Honey or maple syrup" },
+        { amount: "½ tsp", name: "Kosher salt" },
+        { amount: "¼ tsp", name: "Black pepper" },
+        { amount: "6 Tbsp", name: "Extra virgin olive oil" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Combine the base", text: "In a small bowl or jar, combine balsamic vinegar, Dijon, garlic, honey, salt, and pepper. Whisk or stir until smooth. The Dijon acts as an emulsifier — it's what keeps the oil and vinegar from immediately separating." },
+      { num: 2, title: "Emulsify", text: "Slowly drizzle olive oil into the bowl while whisking constantly, or add oil to a jar, seal, and shake vigorously for 30 seconds. The dressing should become noticeably thicker and cohesive." },
+      { num: 3, title: "Taste & adjust", text: "Dip a leaf of lettuce and taste. More vinegar for tang, more honey for balance, more salt to sharpen everything. Store in an airtight jar in the fridge for up to 1 week. Shake before each use." },
+    ]
+  },
+
+  "avocado corn salad": {
+    id: "avocado-corn", section: "sides", servings: 4,
+    sourceUrl: "https://natashaskitchen.com/wprm_print/avocado-corn-salad",
+  },
+
+  "beet, apple, carrot salad": {
+    id: "beet-salad", section: "sides", servings: 4,
+    sourceUrl: "https://www.stephgaudreau.com/beet-carrot-apple-salad-recipe/",
+    notes: "Add ACV for a vinegar kick. Would be great with fish. 1 large beet, 8 carrots, 1 green apple. Nothing needs to be exact!",
+  },
+
+  "1-ingredient buckwheat bread": {
+    id: "buckwheat-bread", section: "sides", servings: 8,
+    sourceUrl: "https://www.google.com/search?q=1+ingredient+buckwheat+bread",
+    notes: "Nutty and dense. Great for avocado toast. Make 3 loaves, slice with parchment squares between, and freeze. Takes time — there are 3 steps: soak, blend, bake (~70 min). Beautiful crust.",
+  },
+
+  // ── DESSERTS ──────────────────────────────────────────────────────────────
+
+  "pumpkin bread": {
+    id: "pumpkin-bread", section: "desserts", servings: 8,
+    chef: "Mama Houska",
+    ingredients: [
+      { group: "Wet", items: [
+        { amount: "1 can (15oz)", name: "Pumpkin puree — not pie filling" },
+        { amount: "2", name: "Large eggs" },
+        { amount: "½ cup", name: "Neutral oil (vegetable or canola)" },
+        { amount: "⅔ cup", name: "Water or orange juice" },
+        { amount: "1 cup", name: "Granulated sugar" },
+        { amount: "½ cup", name: "Brown sugar, packed" },
+      ]},
+      { group: "Dry", items: [
+        { amount: "1¾ cups", name: "All-purpose flour" },
+        { amount: "1 tsp", name: "Baking soda" },
+        { amount: "½ tsp", name: "Baking powder" },
+        { amount: "¾ tsp", name: "Kosher salt" },
+        { amount: "1½ tsp", name: "Ground cinnamon" },
+        { amount: "½ tsp", name: "Ground nutmeg" },
+        { amount: "¼ tsp", name: "Ground cloves" },
+        { amount: "¼ tsp", name: "Ground ginger" },
+      ]},
+      { group: "Optional", items: [
+        { amount: "½ cup", name: "Chopped walnuts or chocolate chips" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Prep", text: "Preheat oven to 350°F. Grease a 9×5-inch loaf pan with butter and dust lightly with flour, or line with parchment paper. Parchment makes it foolproof." },
+      { num: 2, title: "Combine wet", text: "In a large bowl, whisk pumpkin puree, eggs, oil, water or OJ, and both sugars until fully smooth." },
+      { num: 3, title: "Add dry — don't overmix", text: "Add flour, baking soda, baking powder, salt, and all spices directly to the wet mixture. Stir with a spatula until just combined — a few small lumps are fine and desirable. Overmixing develops gluten and produces a tough, dense loaf. Fold in nuts or chips if using.", time: "2 min" },
+      { num: 4, title: "Bake", text: "Pour batter into the pan. Bake 65–75 minutes until a toothpick inserted in the center comes out with just a few moist crumbs — not wet batter. If the top starts to brown too quickly, tent loosely with foil for the final 20 minutes.", time: "65–75 min" },
+      { num: 5, title: "Cool completely", text: "Cool in the pan 15 minutes, then turn out onto a wire rack. Wait at least 30 minutes before slicing — the interior continues setting after it comes out of the oven and slices cleanly only when fully cooled. This bread tastes noticeably better the next day.", time: "30+ min" },
+    ]
+  },
+
+  // ── EXTERNAL ONLY (no written recipe, just sourceUrl) ─────────────────────
+  "orange chicken (natural, lower sugar)": {
+    id: "orange-chicken", section: "chicken", servings: 4,
+    sourceUrl: "https://gatherednutrition.com/no-sugar-added-paleo-orange-cashew-chicken/",
+    notes: "Steam a big batch of veg (peppers, onions, bok choy, carrots, shredded cabbage) and serve over rice. Use ground chicken and add tapioca or arrowroot to thicken the sauce. Skip the cashews.",
+  },
+  "skin clarifying curry carrot soup": {
+    id: "curry-carrot-soup", section: "sides", servings: 4,
+    sourceUrl: "https://bojongourmet.com/vegan-curried-carrot-soup-ginger-coconut-milk/",
+    notes: "Rob's Fav! Add ground chicken for protein. Steam carrots fully before blending or you'll have a bumpy soup. White potato makes it super creamy. Top with vegan or dairy yogurt — the lime squeeze is essential.",
+  },
+  "asian cucumber salad": {
+    id: "cucumber-salad", section: "sides", servings: 2,
+    ingredients: [
+      { group: "", items: [
+        { amount: "2", name: "Persian or English cucumbers" },
+        { amount: "½ tsp", name: "Kosher salt" },
+        { amount: "1½ Tbsp", name: "Rice vinegar" },
+        { amount: "1 tsp", name: "Sesame oil" },
+        { amount: "½ tsp", name: "Soy sauce or tamari" },
+        { amount: "½ tsp", name: "Sugar or honey" },
+        { amount: "1 clove", name: "Garlic, finely grated" },
+        { amount: "1 tsp", name: "Sesame seeds" },
+        { amount: "2", name: "Green onions, thinly sliced" },
+        { amount: "½ tsp", name: "Red pepper flakes (optional)" },
+      ]},
+    ],
+    steps: [
+      { num: 1, title: "Salt the cucumbers", text: "Slice cucumbers into thin rounds or half-moons. Toss with salt and let sit in a colander for 10 minutes. The salt draws out excess water, which would otherwise dilute the dressing and make the salad soggy within minutes.", time: "10 min" },
+      { num: 2, title: "Make the dressing", text: "Whisk together rice vinegar, sesame oil, soy sauce, sugar, and grated garlic in a bowl." },
+      { num: 3, title: "Combine & rest", text: "Pat cucumbers completely dry with paper towels. Toss with dressing, green onions, and red pepper flakes. Let sit 5 minutes for flavors to develop. Top with sesame seeds just before serving.", time: "5 min" },
+    ]
+  },
 };
 
+// ─── SHEET DATA & STATE ───────────────────────────────────────────────────────
 let RECIPES = [];
-let activeCat = 'all';
 let activeDiets = new Set();
+let currentRecipeId = null;
+let currentServings = 4;
 
+// ─── CSV PARSER ───────────────────────────────────────────────────────────────
 function parseCSV(text) {
   const lines = text.trim().split(/\r?\n/);
   const headers = splitLine(lines[0]).map(h => h.trim());
@@ -189,12 +1626,11 @@ function get(row, ...keys) {
 
 function toBool(v) {
   if (!v) return false;
-  const s = v.toString().toUpperCase().trim();
-  return s === 'TRUE' || s === 'YES' || s === '1' || s === 'X';
+  return ['TRUE','YES','1','X'].includes(v.toString().toUpperCase().trim());
 }
 
 function normalizeRow(row) {
-  const name = (get(row, 'name','Name','Recipe Name','recipe_name','RECIPE NAME') || '').trim();
+  const name = (get(row,'name','Name','Recipe Name','recipe_name','RECIPE NAME') || '').trim();
   if (!name) return null;
   const key = name.toLowerCase().trim();
   const w = WRITTEN[key] || {};
@@ -209,9 +1645,12 @@ function normalizeRow(row) {
     total: parseInt(get(row,'total','Total','total_time','Total Time','Total (min)','Total (mins)')) || 0,
     gf: toBool(get(row,'gf','GF','gluten_free','Gluten Free','Gluten-Free')),
     df: toBool(get(row,'df','DF','dairy_free','Dairy Free','Dairy-Free')),
-    veg: toBool(get(row,'veg','Veg','vegetarian','Vegetarian')),
-    notes: get(row,'notes','Notes','note','Note','Comments') || null,
-    sourceUrl: get(row,'sourceUrl','sourceurl','source_url','Source URL','URL','url','Link','link','Source') || null,
+    notes: get(row,'notes','Notes','note','Note','Comments') || w.notes || null,
+    sourceUrl: get(row,'sourceUrl','sourceurl','source_url','Source URL','URL','url','Link','link','Source') || w.sourceUrl || null,
+    section: w.section || w.subcat || (
+      (get(row,'category','Category','Type','type','Course') || '').toLowerCase().includes('dessert') ? 'desserts' : 'sides'
+    ),
+    servings: w.servings || 4,
     ingredients: w.ingredients || null,
     steps: w.steps || null,
   };
@@ -224,139 +1663,256 @@ function formatTime(m) {
   return r ? `${h}h ${r}m` : `${h}h`;
 }
 
-function updateStats() {
-  document.getElementById('total-count').textContent = RECIPES.length;
-  document.getElementById('gf-count').textContent = RECIPES.filter(r => r.gf).length;
+// ─── SERVING SCALER ───────────────────────────────────────────────────────────
+function scaleAmount(raw, mult) {
+  if (mult === 1) return raw;
+  const noScale = /^(to taste|to garnish|to serve|pinch|glug|liberal|few dashes|cooking spray|as needed)/i;
+  if (noScale.test(raw.trim())) return raw;
+  const fracMap = {'½':0.5,'⅓':1/3,'⅔':2/3,'¼':0.25,'¾':0.75,'⅛':0.125,'⅜':0.375,'⅝':0.625,'⅞':0.875};
+  let n = raw;
+  for (const [s,v] of Object.entries(fracMap)) n = n.replace(s, ` ${v}`);
+  n = n.replace(/(\d+)\s+(\d+)\/(\d+)/, (_,w,a,b) => String(+w + +a/+b));
+  n = n.replace(/(\d+)\s+(0\.\d+)/, (_,w,f) => String(+w + +f));
+  n = n.replace(/^(\d+)\/(\d+)/, (_,a,b) => String(+a/+b));
+  const m = n.match(/^([\d.]+)(.*)/);
+  if (!m) return raw;
+  const scaled = parseFloat(m[1]) * mult;
+  const rest = m[2];
+  function fmt(x) {
+    if (x === Math.round(x)) return String(Math.round(x));
+    const nice = [[0.125,'⅛'],[0.25,'¼'],[0.333,'⅓'],[0.375,'⅜'],[0.5,'½'],[0.625,'⅝'],[0.667,'⅔'],[0.75,'¾'],[0.875,'⅞']];
+    const w2 = Math.floor(x), f = x - w2;
+    for (const [val,sym] of nice) if (Math.abs(f-val) < 0.04) return w2 > 0 ? `${w2}${sym}` : sym;
+    return String(Math.round(x*10)/10);
+  }
+  return fmt(scaled) + rest;
 }
 
-function setCat(cat, btn) {
-  activeCat = cat;
-  document.querySelectorAll('#cat-filters .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  filterRecipes();
+function renderIngredientsHTML(recipe, mult) {
+  let h = `<div class="recipe-col-title">Ingredients</div>`;
+  h += `<div class="serving-adjuster">
+    <span class="serving-label">Serves</span>
+    <button class="serving-btn" onclick="adjustServings(-1)">−</button>
+    <span id="serving-count">${currentServings}</span>
+    <button class="serving-btn" onclick="adjustServings(1)">+</button>
+  </div>
+  <div id="ingredients-inner">`;
+  for (const g of recipe.ingredients) {
+    if (g.group) h += `<div class="ingredient-group-title">${g.group}</div>`;
+    for (const item of g.items) {
+      h += `<div class="ingredient-row"><span class="ingredient-amount">${scaleAmount(item.amount, mult)}</span><span class="ingredient-name">${item.name}</span></div>`;
+    }
+  }
+  h += '</div>';
+  return h;
 }
 
+function adjustServings(delta) {
+  const r = RECIPES.find(x => x.id === currentRecipeId);
+  if (!r || !r.servings || !r.ingredients) return;
+  currentServings = Math.max(1, currentServings + delta);
+  const mult = currentServings / r.servings;
+  document.getElementById('serving-count').textContent = currentServings;
+  let inner = '';
+  for (const g of r.ingredients) {
+    if (g.group) inner += `<div class="ingredient-group-title">${g.group}</div>`;
+    for (const item of g.items) {
+      inner += `<div class="ingredient-row"><span class="ingredient-amount">${scaleAmount(item.amount, mult)}</span><span class="ingredient-name">${item.name}</span></div>`;
+    }
+  }
+  document.getElementById('ingredients-inner').innerHTML = inner;
+}
+
+// ─── FILTERS ──────────────────────────────────────────────────────────────────
 function toggleDiet(diet) {
   activeDiets.has(diet) ? activeDiets.delete(diet) : activeDiets.add(diet);
   document.getElementById('btn-gf').classList.toggle('active', activeDiets.has('gf'));
   document.getElementById('btn-df').classList.toggle('active', activeDiets.has('df'));
-  document.getElementById('btn-veg').classList.toggle('active', activeDiets.has('veg'));
-  filterRecipes();
+  filterTOC();
 }
 
-function filterRecipes() {
+function filterTOC() {
   const q = document.getElementById('search').value.toLowerCase().trim();
-  const filtered = RECIPES.filter(r => {
-    if (activeCat !== 'all' && r.category !== activeCat) return false;
-    if (activeDiets.has('gf') && !r.gf) return false;
-    if (activeDiets.has('df') && !r.df) return false;
-    if (activeDiets.has('veg') && !r.veg) return false;
-    if (q && ![r.name, r.chef, r.category, r.notes||''].join(' ').toLowerCase().includes(q)) return false;
-    return true;
+  let visible = 0;
+  document.querySelectorAll('.toc-entry').forEach(el => {
+    const r = RECIPES.find(x => x.id === el.dataset.id);
+    if (!r) return;
+    if (activeDiets.has('gf') && !r.gf) { el.classList.add('hidden'); return; }
+    if (activeDiets.has('df') && !r.df) { el.classList.add('hidden'); return; }
+    if (q) {
+      const hay = [r.name, r.chef, r.notes||'', r.section].join(' ').toLowerCase();
+      if (!hay.includes(q)) { el.classList.add('hidden'); return; }
+    }
+    el.classList.remove('hidden');
+    visible++;
   });
-  renderGrid(filtered);
+  // Show/hide section headers based on whether they have visible entries
+  document.querySelectorAll('.toc-subsection').forEach(sub => {
+    const anyVisible = [...sub.querySelectorAll('.toc-entry')].some(e => !e.classList.contains('hidden'));
+    sub.style.display = anyVisible ? '' : 'none';
+  });
+  document.querySelectorAll('.toc-section').forEach(sec => {
+    const anyVisible = [...sec.querySelectorAll('.toc-entry')].some(e => !e.classList.contains('hidden'));
+    sec.style.display = anyVisible ? '' : 'none';
+  });
+  document.getElementById('no-results').style.display = visible === 0 ? 'block' : 'none';
 }
 
-function renderGrid(recipes) {
-  document.getElementById('results-count').textContent =
-    recipes.length === RECIPES.length ? `${recipes.length} recipes` : `${recipes.length} of ${RECIPES.length} recipes`;
-  if (!recipes.length) {
-    document.getElementById('grid').innerHTML = '<div class="empty-state"><p>No recipes found</p><p>Try adjusting your filters</p></div>';
-    return;
+// ─── TOC RENDERER ─────────────────────────────────────────────────────────────
+function buildTOC() {
+  const tocBody = document.getElementById('toc-body');
+  const parents = ['Mains', 'Sides & Salads', 'Desserts'];
+  function normalizeKey(k) { return k === 'seafood' ? 'fish' : k; }
+  const SECTIONS_D = [
+    { key: 'beef',     label: 'Beef',          parent: 'Mains' },
+    { key: 'chicken',  label: 'Chicken',       parent: 'Mains' },
+    { key: 'fish',     label: 'Fish & Seafood',parent: 'Mains' },
+    { key: 'sides',    label: 'Sides & Salads',parent: 'Sides & Salads' },
+    { key: 'desserts', label: 'Desserts',      parent: 'Desserts' },
+  ];
+  let html = '';
+  for (const parent of parents) {
+    const sections = SECTIONS_D.filter(s => s.parent === parent);
+    let parentHTML = '';
+    for (const sec of sections) {
+      const recipes = RECIPES.filter(r => normalizeKey(r.section) === sec.key);
+      if (!recipes.length) continue;
+      let entriesHTML = '';
+      for (const r of recipes) {
+        entriesHTML += `
+          <div class="toc-entry" data-id="${r.id}" onclick="openRecipe('${r.id}')">
+            <span class="toc-entry-name">${r.name}</span>
+            <span class="toc-dots"></span>
+            <span class="toc-meta">
+              ${r.total ? `<span class="toc-time">${formatTime(r.total)}</span>` : ''}
+              ${r.gf ? '<span class="toc-badge toc-gf">GF</span>' : ''}
+              ${r.df ? '<span class="toc-badge toc-df">DF</span>' : ''}
+            </span>
+          </div>`;
+      }
+      parentHTML += `
+        <div class="toc-subsection">
+          <div class="toc-subsection-title">${sec.label}</div>
+          ${entriesHTML}
+        </div>`;
+    }
+    if (!parentHTML) continue;
+    html += `
+      <div class="toc-section">
+        <div class="toc-section-title">${parent}</div>
+        ${parentHTML}
+      </div>`;
   }
-  document.getElementById('grid').innerHTML = recipes.map(r => `
-    <div class="card" onclick="openModal('${r.id}')">
-      <div class="card-top">
-        <span class="card-category cat-${r.category}">${r.category}</span>
-        ${r.rating ? `<span class="card-rating">★ ${r.rating}</span>` : ''}
-      </div>
-      <h3>${r.name}</h3>
-      <div class="card-chef">by ${r.chef}</div>
-      <div class="card-meta">
-        <span>⏱ ${formatTime(r.total)}</span>
-        ${r.prep ? `<span>Prep ${formatTime(r.prep)}</span>` : ''}
-      </div>
-      <div class="card-badges">
-        ${r.gf ? '<span class="badge badge-gf">GF</span>' : ''}
-        ${r.df ? '<span class="badge badge-df">DF</span>' : ''}
-        ${r.veg ? '<span class="badge badge-veg">Veg</span>' : ''}
-      </div>
-      ${r.notes ? `<div class="card-note">${r.notes.length > 90 ? r.notes.slice(0,90)+'…' : r.notes}</div>` : ''}
-      ${r.steps ? '<div class="has-recipe">Full recipe ↗</div>' : (r.sourceUrl ? '<div class="has-recipe">View source ↗</div>' : '')}
-    </div>`).join('');
+  tocBody.innerHTML = html;
+  document.getElementById('footer-count').textContent = `${RECIPES.length} recipes`;
 }
 
-function openModal(id) {
+function openRecipe(id) {
   const r = RECIPES.find(x => x.id === id);
   if (!r) return;
-  document.getElementById('m-cat').textContent = r.category;
-  document.getElementById('m-name').textContent = r.name;
+  currentRecipeId = id;
+  currentServings = r.servings || 4;
+
+  document.getElementById('toc').style.display = 'none';
+  const page = document.getElementById('recipe-page');
+  page.classList.add('active');
+
+  // Section label
+  const sec = SECTIONS.find(s => s.key === r.section);
+  document.getElementById('r-section').textContent = sec
+    ? (sec.parent === 'Mains' ? `Mains — ${sec.label}` : sec.parent)
+    : 'Recipe';
+
+  document.getElementById('r-title').textContent = r.name;
+
+  // Meta row
+  const metaItems = [
+    { label: 'Chef', value: r.chef || 'Houska' },
+    r.rating ? { label: 'Rating', value: `★ ${r.rating}` } : null,
+    r.prep ? { label: 'Prep', value: formatTime(r.prep) } : null,
+    r.cook ? { label: 'Cook', value: formatTime(r.cook) } : null,
+    r.total ? { label: 'Total', value: formatTime(r.total) } : null,
+    r.servings ? { label: 'Serves', value: r.servings } : null,
+  ].filter(Boolean);
+
+  document.getElementById('r-meta').innerHTML = metaItems.map(m => `
+    <div class="recipe-meta-item">
+      <span class="recipe-meta-label">${m.label}</span>
+      <span class="recipe-meta-value">${m.value}</span>
+    </div>`).join('');
+
+  // Badges
   const badges = [];
-  if (r.gf) badges.push('<span class="modal-badge badge-gf">Gluten-Free</span>');
-  if (r.df) badges.push('<span class="modal-badge badge-df">Dairy-Free</span>');
-  if (r.veg) badges.push('<span class="modal-badge badge-veg">Vegetarian</span>');
-  document.getElementById('m-badges').innerHTML = badges.join('');
-  document.getElementById('m-meta').innerHTML = `
-    <span>by ${r.chef}</span>
-    ${r.rating ? `<span>★ ${r.rating} stars</span>` : ''}
-    <span>Prep ${formatTime(r.prep)}</span>
-    <span>Cook ${formatTime(r.cook)}</span>
-    <span>Total ${formatTime(r.total)}</span>`;
-  let body = '';
-  if (r.notes) body += `<div class="modal-note">${r.notes}</div>`;
+  if (r.gf) badges.push('<span class="recipe-badge badge-gf">Gluten-Free</span>');
+  if (r.df) badges.push('<span class="recipe-badge badge-df">Dairy-Free</span>');
+  document.getElementById('r-badges').innerHTML = badges.join('');
+
+  // Note
+  const noteEl = document.getElementById('r-note');
+  if (r.notes) { noteEl.textContent = r.notes; noteEl.style.display = 'block'; }
+  else { noteEl.style.display = 'none'; }
+
+  // Body
+  let left = '', right = '';
+
   if (r.ingredients) {
-    body += `<div class="modal-section-title">Ingredients</div><div class="ingredients-grid">`;
-    for (const g of r.ingredients) {
-      if (g.group) body += `<div class="ingredient-group-title">${g.group}</div>`;
-      for (const item of g.items) {
-        body += `<div class="ingredient-row"><span class="ingredient-amount">${item.amount}</span><span class="ingredient-name">${item.name}</span></div>`;
-      }
-    }
-    body += '</div>';
+    left = renderIngredientsHTML(r, 1);
   }
+
   if (r.steps) {
-    body += `<div class="modal-section-title">Instructions</div><div class="steps-list">`;
+    right = `<div class="recipe-col-title">Instructions</div><div class="steps-list">`;
     for (const s of r.steps) {
-      body += `<div class="step"><div class="step-num">${s.num}</div><div class="step-content"><div class="step-title">${s.title}</div><div>${s.text}</div>${s.time ? `<div class="step-time">⏱ ${s.time}</div>` : ''}</div></div>`;
+      right += `<div class="step">
+        <div class="step-num">${s.num}</div>
+        <div class="step-content">
+          <div class="step-title">${s.title}</div>
+          <div class="step-text">${s.text}</div>
+          ${s.tip ? `<div class="step-tip">💡 ${s.tip}</div>` : ''}
+          ${s.time ? `<div class="step-time">⏱ ${s.time}</div>` : ''}
+        </div>
+      </div>`;
     }
-    body += '</div>';
+    right += '</div>';
   }
-  if (!r.ingredients && !r.steps) {
-    body += r.sourceUrl
-      ? `<a href="${r.sourceUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:0.5rem;background:var(--rust);color:white;padding:0.75rem 1.25rem;border-radius:6px;text-decoration:none;font-size:0.85rem;font-weight:500;font-family:'DM Sans',sans-serif;">Open Full Recipe ↗</a>`
-      : `<div class="no-recipe">Source URL not available.</div>`;
+
+  if (!r.ingredients && !r.steps && r.sourceUrl) {
+    left = `<a href="${r.sourceUrl}" target="_blank" rel="noopener" class="source-link">Open Full Recipe ↗</a>`;
   }
-  document.getElementById('m-body').innerHTML = body;
-  document.getElementById('modal-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
+
+  document.getElementById('r-body').innerHTML = `
+    <div id="ingredients-col">${left}</div>
+    <div id="steps-col">${right}</div>`;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function closeModal(e) { if (e.target === document.getElementById('modal-overlay')) closeModalDirect(); }
-function closeModalDirect() { document.getElementById('modal-overlay').classList.remove('open'); document.body.style.overflow = ''; }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+function closePage() {
+  document.getElementById('recipe-page').classList.remove('active');
+  document.getElementById('toc').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
+// ─── SHEET LOADER ─────────────────────────────────────────────────────────────
 async function loadFromSheet() {
-  document.getElementById('grid').innerHTML = `
-    <div class="empty-state" style="opacity:1">
-      <p style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink)">Loading recipes…</p>
-      <p style="margin-top:0.5rem;font-size:0.8rem;opacity:0.5">Fetching from Google Sheets</p>
+  document.getElementById('toc-body').innerHTML = `
+    <div class="no-results" style="display:block;opacity:0.5">
+      <p style="font-family:'Playfair Display',serif">Opening the book…</p>
     </div>`;
   try {
     const res = await fetch(SHEET_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
     const rows = parseCSV(text);
-    if (!rows.length) throw new Error('No rows found');
+    if (!rows.length) throw new Error('Sheet appears empty');
     RECIPES = rows.map(normalizeRow).filter(Boolean);
-    if (!RECIPES.length) throw new Error('Could not parse recipes — check column headers match expected names');
-    updateStats();
-    filterRecipes();
+    if (!RECIPES.length) throw new Error('Could not read recipes — check column headers');
+    buildTOC();
   } catch (err) {
-    document.getElementById('grid').innerHTML = `
-      <div class="empty-state" style="opacity:1">
-        <p style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--rust)">Could not load recipes</p>
-        <p style="margin-top:0.5rem;font-size:0.78rem;opacity:0.7">${err.message}</p>
-        <p style="margin-top:0.75rem;font-size:0.75rem;opacity:0.5">File → Share → Publish to web → CSV in Google Sheets</p>
+    document.getElementById('toc-body').innerHTML = `
+      <div class="no-results" style="display:block;opacity:1">
+        <p style="color:var(--rust);font-family:'Playfair Display',serif">Could not load recipes</p>
+        <p style="font-size:0.78rem;margin-top:0.4rem">${err.message}</p>
+        <p style="font-size:0.72rem;margin-top:0.75rem;opacity:0.5">File → Share → Publish to web → CSV in Google Sheets</p>
       </div>`;
   }
 }
